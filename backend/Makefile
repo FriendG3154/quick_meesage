@@ -6,7 +6,7 @@ test:
 generate: ent proto wire
 
 ent:
-	go run entgo.io/ent/cmd/ent@v0.14.6 generate ./ent/schema
+	go run entgo.io/ent/cmd/ent generate --feature sql/modifier,sql/execquery,sql/upsert,sql/lock --target ./ent ./schema
 
 proto:
 	go run github.com/bufbuild/buf/cmd/buf@v1.70.0 generate

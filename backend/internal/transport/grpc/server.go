@@ -5,9 +5,6 @@ import (
 	"log/slog"
 	"time"
 
-	inspirationv1 "quick_meesage/backend/api/gen/inspiration/v1"
-	"quick_meesage/backend/internal/service"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/health"
@@ -15,9 +12,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func New(ideas *service.IdeaService) *grpc.Server {
+func New() *grpc.Server {
 	server := grpc.NewServer(grpc.ChainUnaryInterceptor(loggingInterceptor))
-	inspirationv1.RegisterInspirationServiceServer(server, NewInspirationService(ideas))
 	healthv1.RegisterHealthServer(server, health.NewServer())
 	return server
 }

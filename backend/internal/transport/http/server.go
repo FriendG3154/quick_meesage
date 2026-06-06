@@ -4,13 +4,11 @@ import (
 	"net/http"
 
 	"quick_meesage/backend/internal/config"
-	"quick_meesage/backend/internal/service"
 )
 
-func New(cfg config.Config, ideas *service.IdeaService) *http.Server {
+func New(cfg config.Config) *http.Server {
 	mux := http.NewServeMux()
 	registerHealth(mux)
-	registerIdeaRoutes(mux, ideas)
 
 	return &http.Server{
 		Addr:    cfg.HTTPAddr,

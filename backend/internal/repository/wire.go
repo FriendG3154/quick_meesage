@@ -1,12 +1,5 @@
 package repository
 
-import (
-	"quick_meesage/backend/internal/service"
+import "github.com/google/wire"
 
-	"github.com/google/wire"
-)
-
-var Set = wire.NewSet(
-	NewIdeaRepository,
-	wire.Bind(new(service.IdeaRepository), new(*IdeaRepository)),
-)
+var Set = wire.NewSet()

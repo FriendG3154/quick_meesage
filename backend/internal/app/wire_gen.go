@@ -8,11 +8,9 @@ package app
 
 import (
 	"quick_meesage/backend/internal/config"
-	"quick_meesage/backend/internal/repository"
-	"quick_meesage/backend/internal/service"
 	"quick_meesage/backend/internal/storage"
-	"quick_meesage/backend/internal/transport/grpc"
-	"quick_meesage/backend/internal/transport/http"
+	grpcserver "quick_meesage/backend/internal/transport/grpc"
+	httpserver "quick_meesage/backend/internal/transport/http"
 )
 
 // Injectors from wire.go:
@@ -28,10 +26,8 @@ func Initialize() (*App, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	ideaRepository := repository.NewIdeaRepository(client)
-	ideaService := service.NewIdeaService(ideaRepository)
-	server := httpserver.New(configConfig, ideaService)
-	grpcServer := grpcserver.New(ideaService)
+	server := httpserver.New(configConfig)
+	grpcServer := grpcserver.New()
 	app := New(configConfig, client, db, server, grpcServer)
 	return app, func() {
 		cleanup2()
