@@ -1,0 +1,7 @@
+/backend/bin/
+/dist/
+/backend/.env
+/backend/.gocache/
+/backend/.gomodcache/
+/backend/*.exe
+/ent/

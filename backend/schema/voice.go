@@ -21,6 +21,7 @@ func (Voice) Fields() []ent.Field {
 		field.String("url").Optional().MaxLen(255).Comment("音频文件地址"),
 		field.String("remark").Optional().MaxLen(255).Comment("音频备注"),
 		field.String("content").Optional().Comment("音频文字转换结果"),
+		field.Bool("is_deleted").Optional().StorageKey("delete").Comment("软删除"),
 	}
 }
 

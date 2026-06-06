@@ -22,6 +22,7 @@ func (Pic) Fields() []ent.Field {
 		field.String("pid").Optional().MaxLen(255).
 			Comment("父节点-如果设计编辑后，可以参考反馈查看"),
 		field.String("remake").Optional().Comment("备注"),
+		field.Bool("is_deleted").Optional().StorageKey("delete").Comment("软删除"),
 	}
 }
 

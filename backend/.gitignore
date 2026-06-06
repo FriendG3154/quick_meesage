@@ -1,6 +1,0 @@
-/bin/
-/dist/
-/.env
-/.gocache/
-/.gomodcache/
-*.exe
