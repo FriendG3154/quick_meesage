@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"quick_meesage/backend/ent"
 	"quick_meesage/backend/internal/config"
 	"quick_meesage/backend/internal/storage"
 
@@ -17,14 +18,16 @@ import (
 
 type App struct {
 	cfg        config.Config
+	entClient  *ent.Client
 	db         *sql.DB
 	httpServer *http.Server
 	grpcServer *grpc.Server
 }
 
-func New(cfg config.Config, db *sql.DB, httpServer *http.Server, grpcServer *grpc.Server) *App {
+func New(cfg config.Config, entClient *ent.Client, db *sql.DB, httpServer *http.Server, grpcServer *grpc.Server) *App {
 	return &App{
 		cfg:        cfg,
+		entClient:  entClient,
 		db:         db,
 		httpServer: httpServer,
 		grpcServer: grpcServer,
@@ -32,8 +35,13 @@ func New(cfg config.Config, db *sql.DB, httpServer *http.Server, grpcServer *grp
 }
 
 func (a *App) Run(ctx context.Context) error {
-	if err := storage.Migrate(ctx, a.db); err != nil {
-		return fmt.Errorf("migrate database: %w", err)
+	// 先执行 ent 框架的迁移
+	if err := storage.Migrate(ctx, a.entClient); err != nil {
+		return fmt.Errorf("migrate ent tables: %w", err)
+	}
+	// 再执行 backend/schema 下的纯 SQL 迁移
+	if err := storage.MigrateSQLTables(ctx, a.db); err != nil {
+		return fmt.Errorf("migrate sql tables: %w", err)
 	}
 
 	listener, err := net.Listen("tcp", a.cfg.GRPCAddr)

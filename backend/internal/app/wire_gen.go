@@ -23,12 +23,18 @@ func Initialize() (*App, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
+	db, cleanup2, err := storage.NewDB(configConfig)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
 	ideaRepository := repository.NewIdeaRepository(client)
 	ideaService := service.NewIdeaService(ideaRepository)
 	server := httpserver.New(configConfig, ideaService)
 	grpcServer := grpcserver.New(ideaService)
-	app := New(configConfig, client, server, grpcServer)
+	app := New(configConfig, client, db, server, grpcServer)
 	return app, func() {
+		cleanup2()
 		cleanup()
 	}, nil
 }

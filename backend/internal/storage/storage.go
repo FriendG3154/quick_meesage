@@ -4,12 +4,12 @@ import (
 	"context"
 	"database/sql"
 
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
+	"quick_meesage/backend/ent"
 	"quick_meesage/backend/internal/config"
 	"quick_meesage/backend/schema/migrations"
 
-	"entgo.io/ent"
-	"entgo.io/ent/dialect"
-	entsql "entgo.io/ent/dialect/sql"
 	"github.com/google/wire"
 	_ "modernc.org/sqlite"
 )
