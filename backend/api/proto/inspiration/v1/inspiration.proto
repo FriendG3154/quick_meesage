@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package inspiration.v1;
+
+option go_package = "quick_meesage/backend/api/gen/inspiration/v1;inspirationv1";
+
+service InspirationService {
+  rpc CreateIdea(CreateIdeaRequest) returns (CreateIdeaResponse);
+  rpc ListIdeas(ListIdeasRequest) returns (ListIdeasResponse);
+}
+
+message Idea {
+  int64 id = 1;
+  string content = 2;
+  string source = 3;
+  string created_at = 4;
+}
+
+message CreateIdeaRequest {
+  string content = 1;
+  string source = 2;
+}
+
+message CreateIdeaResponse {
+  Idea idea = 1;
+}
+
+message ListIdeasRequest {
+  string cursor = 1;
+  int32 limit = 2;
+}
+
+message ListIdeasResponse {
+  repeated Idea ideas = 1;
+  string next_cursor = 2;
+  bool has_more = 3;
+}

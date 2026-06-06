@@ -1,0 +1,79 @@
+<view class="vr-page {{darkMode ? 'dark-mode' : ''}}">
+  <!-- Top Bar -->
+  <view class="vr-topbar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="vr-topbar-inner">
+      <view class="back-btn" bindtap="goBack" style='width: 37px;'>
+        <text class="back-arrow">‹</text>
+      </view>
+      <text class="top-bar-title">语音录音</text>
+      <view style="width: 72rpx;">
+       
+      </view>
+    </view>
+  </view>
+
+  <!-- Main Content -->
+  <view class="vr-content" style="padding-top: {{contentTop}}px;">
+    <!-- Recording Status Indicator -->
+    <view class="rec-status">
+      <view class="rec-dot {{isRecording ? 'rec-dot-active' : 'rec-dot-paused'}}"></view>
+      <text class="rec-label">{{isRecording ? 'RECORDING' : (isPaused ? 'PAUSED' : 'READY')}}</text>
+    </view>
+
+    <!-- Timer Display -->
+    <view class="timer-display">
+      <text class="timer-text">{{timerDisplay}}</text>
+    </view>
+
+    <!-- Waveform Visualizer -->
+    <view class="waveform-container">
+      <view
+        wx:for="{{waveformBars}}"
+        wx:key="index"
+        class="waveform-bar"
+        style="height: {{item}}rpx; opacity: {{isRecording ? 1 : 0.3}};"
+      ></view>
+    </view>
+
+    <!-- AI Transcription Card -->
+    <view class="transcription-card">
+      <view class="transcription-badge">
+        <text class="badge-text">AI 语音识别</text>
+      </view>
+      <text class="transcription-text">"{{transcriptionText}}"</text>
+      <view wx:if="{{isRecording}}" class="transcription-footer">
+        <text class="transcribing-indicator">正在识别...</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Bottom Controls -->
+  <view class="vr-controls">
+    <!-- Discard -->
+    <view class="ctrl-btn" bindtap="discardRecording">
+      <view class="ctrl-btn-inner ctrl-btn-gray">
+        <text class="ctrl-icon">🗑️</text>
+      </view>
+      <text class="ctrl-label">丢弃</text>
+    </view>
+
+    <!-- Main Mic/Pause Button -->
+    <view class="main-btn-wrap">
+      <view class="main-btn-glow"></view>
+      <view class="main-btn {{isRecording ? 'main-btn-recording' : 'main-btn-idle'}}" bindtap="toggleRecording">
+        <text class="main-btn-icon">{{isRecording ? '⏸' : '🎙'}}</text>
+      </view>
+    </view>
+
+    <!-- Finish -->
+    <view class="ctrl-btn" bindtap="finishRecording">
+      <view class="ctrl-btn-inner ctrl-btn-blue">
+        <text class="ctrl-icon ctrl-icon-check">✓</text>
+      </view>
+      <text class="ctrl-label ctrl-label-blue">完成</text>
+    </view>
+  </view>
+
+  <!-- Bottom Tab Placeholder -->
+  <view class="bottom-spacer"></view>
+</view>

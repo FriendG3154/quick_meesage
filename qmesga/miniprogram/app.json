@@ -1,0 +1,41 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/mobile-login/mobile-login",
+    "pages/statistics/statistics",
+    "pages/index/index",
+    "pages/settings/settings",
+    "pages/voice-record/voice-record",
+    "pages/drawing/drawing",
+    "pages/text-note/text-note"
+  ],
+  "tabBar": {
+    "custom": true,
+    "color": "#3d4a3d",
+    "selectedColor": "#0052FF",
+    "backgroundColor": "#f9f9f9",
+    "list": [
+      {
+        "pagePath": "pages/statistics/statistics",
+        "text": "统计"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "text": "记录"
+      },
+      {
+        "pagePath": "pages/settings/settings",
+        "text": "设置"
+      }
+    ]
+  },
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationStyle": "custom",
+    "backgroundColor": "#f9f9f9"
+  },
+  "style": "v2",
+  "darkmode": true,
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

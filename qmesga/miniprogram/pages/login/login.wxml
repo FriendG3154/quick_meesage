@@ -1,0 +1,65 @@
+<view class="login-page {{darkMode ? 'dark-mode' : ''}}">
+  <!-- Background Decorative Blobs -->
+  <view class="bg-blob blob-top"></view>
+  <view class="bg-blob blob-bottom"></view>
+
+  <!-- Main Content -->
+  <view class="login-content">
+    <!-- Branding -->
+    <view class="brand-section">
+      <view class="brand-icon">
+        <view class="brand-bolt">⚡</view>
+      </view>
+      <text class="brand-name">VELOCITY</text>
+    </view>
+
+    <!-- Hero Text -->
+    <view class="hero-section">
+      <text class="hero-title">快灵感</text>
+      <text class="hero-subtitle">让灵感快人一步</text>
+    </view>
+
+    <!-- Login Actions -->
+    <view class="login-actions">
+      <!-- Primary: WeChat Login -->
+      <view class="btn-wechat" bindtap="loginWithWechat">
+        <view class="wechat-icon">💬</view>
+        <text class="btn-wechat-text">微信快捷登录</text>
+      </view>
+
+      <!-- Divider -->
+      <view class="divider-row">
+        <view class="divider-line"></view>
+        <text class="divider-text">OR</text>
+        <view class="divider-line"></view>
+      </view>
+
+      <!-- Secondary: Mobile Number -->
+      <view class="btn-mobile" bindtap="goToMobileLogin">
+        <view class="mobile-left">
+          <view class="phone-icon-wrap">
+            <text class="phone-icon">📱</text>
+          </view>
+          <text class="btn-mobile-text">手机号登录</text>
+        </view>
+        <text class="arrow-icon">→</text>
+      </view>
+    </view>
+
+    <!-- Footer Brand Repeat -->
+    <!-- <view class="footer-brand">
+      <view class="brand-icon brand-icon-sm">
+        <view class="brand-bolt">⚡</view>
+      </view>
+      <text class="brand-name brand-name-sm">VELOCITY</text>
+    </view> -->
+
+    <!-- Terms -->
+    <view class="terms-section">
+      <text class="terms-text">继续即表示同意 </text>
+      <text class="terms-link">服务条款</text>
+      <text class="terms-text"> 和 </text>
+      <text class="terms-link">隐私政策</text>
+    </view>
+  </view>
+</view>

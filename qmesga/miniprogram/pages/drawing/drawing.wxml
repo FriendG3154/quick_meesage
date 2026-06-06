@@ -1,0 +1,111 @@
+<view class="drawing-page {{darkMode ? 'dark-mode' : ''}}">
+  <!-- Top Bar -->
+  <view class="drawing-topbar" style="padding-top: {{statusBarHeightRpx}}rpx;">
+    <view class="drawing-topbar-inner">
+      <view class="back-btn" bindtap="goBack" style='width: 37px;'>
+        <text class="back-arrow">‹</text>
+      </view>
+      <text class="top-bar-title">画板</text>
+      <view style="width: 72rpx;">
+       
+      </view>
+      <!-- <view class="back-btn" bindtap="goBack">
+        <text class="back-arrow">‹</text>
+        <text class="back-label">画板</text>
+      </view> -->
+    
+    </view>
+  </view>
+
+  <!-- Canvas Area -->
+  <view class="canvas-container" style="top: {{canvasTopRpx}}rpx; height: {{canvasHeightRpx}}rpx;">
+    <canvas
+      canvas-id="drawingCanvas"
+      id="drawingCanvas"
+      class="drawing-canvas"
+      style="width: {{canvasWidthPx}}px; height: {{canvasHeightPx}}px;"
+      bindtouchstart="onTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd"
+      disable-scroll="true"
+    ></canvas>
+    <!-- Placeholder watermark -->
+    <view class="canvas-placeholder" wx:if="{{isEmpty}}">
+      <text class="placeholder-icon">✏️</text>
+      <text class="placeholder-text">在这里开始创作</text>
+    </view>
+  </view>
+
+  <!-- Expand toggle -->
+  <view class="expand-toggle" bindtap="toggleToolbar">
+    <text class="expand-icon">{{toolbarExpanded ? '∨' : '∧'}}</text>
+  </view>
+
+  <!-- Bottom Toolbar -->
+  <view class="drawing-toolbar {{toolbarExpanded ? 'toolbar-expanded' : ''}}">
+    <!-- Tool Selector -->
+    <view class="toolbar-row">
+      <view class="tool-selector">
+        <!-- Pen -->
+        <view class="tool-btn {{currentTool === 'pen' ? 'tool-active' : ''}}" bindtap="selectTool" data-tool="pen">
+          <text class="tool-icon">✏️</text>
+        </view>
+        <!-- Eraser -->
+        <view class="tool-btn {{currentTool === 'eraser' ? 'tool-active' : ''}}" bindtap="selectTool" data-tool="eraser">
+          <text class="tool-icon">🧲</text>
+        </view>
+      </view>
+      <!-- Brush Size Dots -->
+      <view class="brush-sizes">
+        <view class="brush-dot size-sm {{brushSize === 4 ? 'dot-active' : ''}}" bindtap="setBrushSize" data-size="4"></view>
+        <view class="brush-dot size-md {{brushSize === 10 ? 'dot-active' : ''}}" bindtap="setBrushSize" data-size="10"></view>
+        <view class="brush-dot size-lg {{brushSize === 18 ? 'dot-active' : ''}}" bindtap="setBrushSize" data-size="18"></view>
+      </view>
+    </view>
+
+    <!-- Color Palette -->
+    <view class="color-palette">
+      <view class="colors-row">
+        <view
+          wx:for="{{colors}}"
+          wx:key="index"
+          class="color-dot {{currentColor === item ? 'color-active' : ''}}"
+          style="background: {{item}};"
+          bindtap="selectColor"
+          data-color="{{item}}"
+        >
+          <view wx:if="{{currentColor === item}}" class="color-check">✓</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Action Row -->
+    <view class="action-row">
+      <view class="action-btn" bindtap="choosePhoto">
+        <text class="action-icon">🖼️</text>
+        <text class="action-label">{{bgImage ? '换图' : '底图'}}</text>
+      </view>
+      <view class="action-btn" wx:if="{{bgImage}}" bindtap="removePhoto">
+        <text class="action-icon">✕</text>
+        <text class="action-label">去底图</text>
+      </view>
+      <view class="action-btn" bindtap="undo">
+        <text class="action-icon">↩</text>
+        <text class="action-label">撤销</text>
+      </view>
+      <view class="action-btn" bindtap="redo">
+        <text class="action-icon">↪</text>
+        <text class="action-label">重做</text>
+      </view>
+      <view class="action-btn action-clear" bindtap="clearCanvas">
+        <text class="action-icon">🗑️</text>
+        <text class="action-label action-label-red">清除</text>
+      </view>
+    </view>
+
+    <!-- Send Button -->
+    <view class="send-btn" bindtap="sendDrawing">
+      <text class="send-text">发送</text>
+    </view>
+  </view>
+</view>

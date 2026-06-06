@@ -1,0 +1,112 @@
+<view class="settings-page {{darkMode ? 'dark-mode' : ''}}">
+  <!-- Top Bar -->
+  <view class="settings-topbar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="settings-topbar-inner">
+      <view class="back-btn" bindtap="goBack">
+        <text class="back-arrow-blue">‹</text>
+      </view>
+      <text class="settings-topbar-title">设置</text>
+      <text class="more-dots">···</text>
+    </view>
+  </view>
+
+  <scroll-view class="settings-scroll" scroll-y>
+    <view class="settings-content">
+
+      <!-- Profile Card -->
+      <view class="profile-card">
+        <view class="avatar-wrap">
+          <view class="avatar-placeholder">
+            <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill" />
+            <text wx:else class="avatar-emoji">👤</text>
+          </view>
+          <view class="edit-avatar-btn">
+            <text class="edit-icon">✏️</text>
+          </view>
+        </view>
+        <text class="profile-name">{{nickname}}</text>
+        <view class="profile-badges">
+          <view class="pro-badge">
+            <text class="pro-text">共 {{totalNotes}} 条笔记</text>
+          </view>
+          <text class="user-id">{{userId}}</text>
+        </view>
+      </view>
+
+      <!-- Preferences Section -->
+      <view class="pref-section">
+        <text class="pref-section-label">应用偏好</text>
+        <view class="pref-card">
+          <!-- Theme Mode -->
+          <view class="pref-row" bindtap="showThemeOptions">
+            <view class="pref-row-left">
+              <view class="pref-icon-wrap pref-icon-blue">
+                <text class="pref-icon">🌙</text>
+              </view>
+              <view class="pref-label-group">
+                <text class="pref-label">外观模式</text>
+                <text class="pref-sublabel">{{themeModeText}}</text>
+              </view>
+            </view>
+            <text class="chevron-right">›</text>
+          </view>
+
+          <!-- Divider -->
+          <view class="pref-divider"></view>
+
+          <!-- Privacy -->
+          <view class="pref-row" bindtap="goPrivacy">
+            <view class="pref-row-left">
+              <view class="pref-icon-wrap pref-icon-green">
+                <text class="pref-icon">🛡️</text>
+              </view>
+              <text class="pref-label">隐私与安全</text>
+            </view>
+            <text class="chevron-right">›</text>
+          </view>
+
+          <!-- Divider -->
+          <view class="pref-divider"></view>
+
+          <!-- Clear Cache -->
+          <view class="pref-row" bindtap="clearCache">
+            <view class="pref-row-left">
+              <view class="pref-icon-wrap pref-icon-orange">
+                <text class="pref-icon">🗑️</text>
+              </view>
+              <text class="pref-label">清除缓存</text>
+            </view>
+            <text class="chevron-right">›</text>
+          </view>
+
+          <!-- Divider -->
+          <view class="pref-divider"></view>
+
+          <!-- About -->
+          <view class="pref-row" bindtap="goAbout">
+            <view class="pref-row-left">
+              <view class="pref-icon-wrap pref-icon-purple">
+                <text class="pref-icon">ℹ️</text>
+              </view>
+              <text class="pref-label">关于</text>
+            </view>
+            <text class="chevron-right">›</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- Logout Button -->
+      <view class="logout-btn" bindtap="doLogout">
+        <text class="logout-icon">↪</text>
+        <text class="logout-text">退出当前账号</text>
+      </view>
+
+      <!-- Version Info -->
+      <view class="version-info">
+        <text class="version-text">VELOCITY · V2.4.0 (STABLE)</text>
+      </view>
+
+      <view class="bottom-spacer"></view>
+    </view>
+  </scroll-view>
+</view>

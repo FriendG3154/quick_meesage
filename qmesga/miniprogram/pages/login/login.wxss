@@ -1,0 +1,231 @@
+.login-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* padding: 80rpx 48rpx; */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background blobs */
+.bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.blob-top {
+  top: -160rpx;
+  right: -160rpx;
+  width: 600rpx;
+  height: 600rpx;
+  background: var(--color-primary-soft);
+}
+
+.blob-bottom {
+  bottom: -160rpx;
+  left: -160rpx;
+  width: 600rpx;
+  height: 600rpx;
+  background: var(--color-primary-soft);
+}
+
+/* Content */
+.login-content {
+  width: 100%;
+  max-width: 600rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+/* Branding */
+.brand-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 80rpx;
+}
+
+.brand-icon {
+  width: 96rpx;
+  height: 96rpx;
+  background: #0052FF;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-bolt {
+  font-size: 44rpx;
+  color: #fff;
+}
+
+.brand-name {
+  font-size: 30rpx;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--color-text);
+}
+
+/* Hero */
+.hero-section {
+  text-align: center;
+  margin-bottom: 80rpx;
+  width: 100%;
+}
+
+.hero-title {
+  display: block;
+  font-size: 88rpx;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 16rpx;
+}
+
+.hero-subtitle {
+  display: block;
+  font-size: 30rpx;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+/* Login Actions */
+.login-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 80rpx;
+}
+
+/* WeChat Button */
+.btn-wechat {
+  width: 100%;
+  height: 104rpx;
+  background: #0052FF;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20rpx;
+}
+
+.btn-wechat:active {
+  opacity: 0.88;
+  transform: scale(0.98);
+}
+
+.wechat-icon {
+  font-size: 38rpx;
+}
+
+.btn-wechat-text {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+}
+
+/* Divider */
+.divider-row {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 40rpx 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 2rpx;
+  background: var(--color-divider);
+}
+
+.divider-text {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  letter-spacing: 0.12em;
+}
+
+/* Mobile Button */
+.btn-mobile {
+  /* width: 100%; */
+  height: 96rpx;
+  background: var(--color-card-alt);
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36rpx;
+}
+
+.btn-mobile:active {
+  opacity: 0.7;
+  transform: scale(0.99);
+}
+
+.mobile-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.phone-icon-wrap {
+  font-size: 36rpx;
+}
+
+.btn-mobile-text {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.arrow-icon {
+  font-size: 32rpx;
+  color: var(--color-text-secondary);
+}
+
+/* Footer brand */
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 40rpx;
+}
+
+.brand-icon-sm {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 20rpx;
+}
+
+.brand-name-sm {
+  font-size: 26rpx;
+}
+
+/* Terms */
+.terms-section {
+  text-align: center;
+  padding: 0 32rpx;
+}
+
+.terms-text {
+  font-size: 24rpx;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+}
+
+.terms-link {
+  font-size: 24rpx;
+  color: #0052FF;
+  font-weight: 600;
+}

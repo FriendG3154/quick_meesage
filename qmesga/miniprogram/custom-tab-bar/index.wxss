@@ -1,0 +1,149 @@
+/* Light mode defaults (component cannot inherit page-level CSS vars) */
+.tab-bar {
+  --color-tab-bg: #f9f9f9;
+  --color-border-light: rgba(0, 0, 0, 0.05);
+  --color-text-secondary: #3d4a3d;
+  --color-primary: #0052FF;
+  --color-bg: #f9f9f9;
+
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: var(--color-tab-bg);
+  height: 112rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+/* Dark mode overrides */
+.tab-bar.dark-mode {
+  --color-tab-bg: #0F0F0F;
+  --color-border-light: rgba(255, 255, 255, 0.06);
+  --color-text-secondary: #A0A0A0;
+  --color-primary: #4D8AFF;
+  --color-bg: #0F0F0F;
+}
+
+.tab-bar-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1rpx;
+  background: var(--color-border-light);
+}
+
+.tab-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  padding: 16rpx 0;
+  transition: all 0.2s;
+}
+
+.tab-bar-item:active {
+  opacity: 0.6;
+  transform: scale(0.92);
+}
+
+.tab-label {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.tab-bar-item.active .tab-label {
+  color: #0052FF;
+}
+
+/* Tab Icons */
+.tab-icon {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Analytics Icon - bar chart */
+.icon-analytics {
+  display: flex;
+  align-items: flex-end;
+  gap: 5rpx;
+  height: 36rpx;
+  width: 40rpx;
+}
+
+.bar {
+  border-radius: 4rpx 4rpx 0 0;
+  background: var(--color-text-secondary);
+  width: 10rpx;
+}
+
+.b1 { height: 20rpx; }
+.b2 { height: 32rpx; }
+.b3 { height: 26rpx; }
+
+.tab-bar-item.active .bar {
+  background: #0052FF;
+}
+
+/* Edit Icon */
+.icon-edit {
+  width: 36rpx;
+  height: 36rpx;
+  position: relative;
+  border: 4rpx solid var(--color-text-secondary);
+  border-radius: 6rpx;
+}
+
+.icon-edit-active {
+  border-color: #0052FF;
+  background: rgba(0, 82, 255, 0.08);
+}
+
+.edit-tip {
+  position: absolute;
+  top: -3rpx;
+  right: -3rpx;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 3rpx solid var(--color-bg);
+}
+
+/* Settings Icon */
+.icon-settings {
+  width: 38rpx;
+  height: 38rpx;
+  border-radius: 50%;
+  border: 4rpx solid var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.icon-settings-active {
+  border-color: #0052FF;
+}
+
+.gear-center {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: var(--color-text-secondary);
+}
+
+.icon-settings-active .gear-center {
+  background: #0052FF;
+}

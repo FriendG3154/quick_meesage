@@ -1,0 +1,35 @@
+<view class="tab-bar {{darkMode ? 'dark-mode' : ''}}">
+  <view class="tab-bar-border"></view>
+  <view
+    wx:for="{{list}}"
+    wx:key="index"
+    class="tab-bar-item {{selected === index ? 'active' : ''}}"
+    bindtap="switchTab"
+    bindlongpress="longPressTab"
+    data-path="{{item.pagePath}}"
+    data-index="{{index}}"
+  >
+    <!-- Statistics Icon -->
+    <view wx:if="{{index === 0}}" class="tab-icon {{selected === 0 ? 'tab-icon-active' : ''}}">
+      <view class="icon-analytics">
+        <view class="bar b1"></view>
+        <view class="bar b2"></view>
+        <view class="bar b3"></view>
+      </view>
+    </view>
+    <!-- Record Icon -->
+    <view wx:elif="{{index === 1}}" class="tab-icon {{selected === 1 ? 'tab-icon-active' : ''}}">
+      <view class="icon-edit {{selected === 1 ? 'icon-edit-active' : ''}}">
+        <view class="edit-body"></view>
+        <view class="edit-tip"></view>
+      </view>
+    </view>
+    <!-- Settings Icon -->
+    <view wx:elif="{{index === 2}}" class="tab-icon {{selected === 2 ? 'tab-icon-active' : ''}}">
+      <view class="icon-settings {{selected === 2 ? 'icon-settings-active' : ''}}">
+        <view class="gear-center"></view>
+      </view>
+    </view>
+    <text class="tab-label">{{item.text}}</text>
+  </view>
+</view>

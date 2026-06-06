@@ -1,0 +1,139 @@
+<view class="stat-page {{darkMode ? 'dark-mode' : ''}}">
+  <!-- Top Bar -->
+  <view class="stat-topbar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="stat-topbar-inner">
+      <view class="back-btn" bindtap="goBack">
+        <text class="back-arrow">‹</text>
+      </view>
+      <text class="stat-topbar-title">统计</text>
+      <view style="width: 72rpx;"></view>
+    </view>
+  </view>
+
+  <scroll-view class="stat-scroll" scroll-y>
+    <view class="stat-content">
+      <!-- Weekly Overview Header -->
+      <view class="week-header">
+        <text class="week-label">WEEKLY OVERVIEW</text>
+        <text class="week-title">本周数据概览</text>
+      </view>
+
+      <!-- Bento Metric Cards -->
+      <view class="metric-grid">
+        <view class="metric-card metric-primary">
+          <view class="metric-card-top">
+            <text class="metric-icon-emoji">📊</text>
+            <view class="metric-badge" wx:if="{{weekGrowthRate !== '0'}}">{{weekGrowthRate}}%</view>
+          </view>
+          <text class="metric-label">本周总计</text>
+          <text class="metric-value">{{thisWeekTotal}}</text>
+        </view>
+        <view class="metric-card metric-secondary">
+          <view class="metric-card-top">
+            <text class="metric-icon-emoji">🕐</text>
+          </view>
+          <text class="metric-label">上周同期</text>
+          <text class="metric-value">{{lastWeekTotal}}</text>
+        </view>
+      </view>
+
+      <!-- Total Notes Card -->
+      <view class="metric-card metric-primary" style="margin-bottom: 24rpx;">
+        <view class="metric-card-top">
+          <text class="metric-icon-emoji">📋</text>
+        </view>
+        <text class="metric-label">全部笔记</text>
+        <text class="metric-value">{{totalNotes}}</text>
+      </view>
+
+      <!-- Category Stats -->
+      <view class="category-card">
+        <view class="category-header">
+          <view>
+            <text class="category-title">分类统计</text>
+            <text class="category-subtitle">各类型笔记分布</text>
+          </view>
+          <view class="active-badge">
+            <view class="active-dot"></view>
+            <text class="active-text">ACTIVE</text>
+          </view>
+        </view>
+
+        <!-- Voice Bar -->
+        <view class="stat-bar-item">
+          <view class="stat-bar-label-row">
+            <view class="bar-label-left">
+              <text class="bar-icon">🎙</text>
+              <text class="bar-name">语音</text>
+            </view>
+            <text class="bar-value">{{voiceCount}} <text class="bar-pct">{{voicePct}}%</text></text>
+          </view>
+          <view class="bar-track">
+            <view class="bar-fill" style="width: {{voicePct}}%;"></view>
+          </view>
+        </view>
+
+        <!-- Drawing Bar -->
+        <view class="stat-bar-item">
+          <view class="stat-bar-label-row">
+            <view class="bar-label-left">
+              <text class="bar-icon">🎨</text>
+              <text class="bar-name">手绘</text>
+            </view>
+            <text class="bar-value">{{drawingCount}} <text class="bar-pct">{{drawingPct}}%</text></text>
+          </view>
+          <view class="bar-track">
+            <view class="bar-fill" style="width: {{drawingPct}}%;"></view>
+          </view>
+        </view>
+
+        <!-- Text Bar -->
+        <view class="stat-bar-item">
+          <view class="stat-bar-label-row">
+            <view class="bar-label-left">
+              <text class="bar-icon">📝</text>
+              <text class="bar-name">文本</text>
+            </view>
+            <text class="bar-value">{{textCount}} <text class="bar-pct">{{textPct}}%</text></text>
+          </view>
+          <view class="bar-track">
+            <view class="bar-fill" style="width: {{textPct}}%;"></view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Empty State -->
+      <view class="empty-state" wx:if="{{totalNotes === 0}}">
+        <text class="empty-icon">✨</text>
+        <text class="empty-title">还没有记录</text>
+        <text class="empty-desc">开始创建你的第一条笔记吧</text>
+      </view>
+
+      <!-- Trends Section -->
+      <view class="trends-section" wx:if="{{totalNotes > 0}}">
+        <text class="trends-title">数据趋势</text>
+
+        <view class="trend-item">
+          <view class="trend-icon-wrap">
+            <text class="trend-icon">📈</text>
+          </view>
+          <view class="trend-info">
+            <text class="trend-name">{{weekGrowthRate > 0 ? '增长势头强劲' : '保持记录习惯'}}</text>
+            <text class="trend-desc">本周共创建了 {{thisWeekTotal}} 条笔记</text>
+          </view>
+          <text class="trend-arrow">›</text>
+        </view>
+
+        <!-- Feature Banner -->
+        <view class="feature-banner">
+          <view class="banner-overlay">
+            <text class="banner-tag">VELOCITY</text>
+            <text class="banner-title">坚持记录，收获灵感</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="bottom-spacer"></view>
+    </view>
+  </scroll-view>
+</view>

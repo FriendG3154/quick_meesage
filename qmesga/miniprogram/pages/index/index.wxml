@@ -1,0 +1,134 @@
+<!--index.wxml - Record Selection Page-->
+<view class="record-page {{darkMode ? 'dark-mode' : ''}}">
+  <!-- Top Navigation Bar -->
+  <view class="top-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="top-bar-inner">
+      <view class="back-btn" bindtap="goBack">
+        <text class="back-arrow">‹</text>
+      </view>
+      <text class="top-bar-title">记录</text>
+      <view style='width: 72rpx;'>
+       
+      </view>
+    </view>
+  </view>
+
+  <!-- Scrollable Content -->
+  <scroll-view class="record-scroll" scroll-y>
+    <view class="record-content">
+      <!-- Hero Section -->
+      <view class="hero-sec">
+        <text class="hero-big-title">准备好了吗？</text>
+        <text class="hero-desc">选择一种方式，开始即时捕捉灵感。</text>
+      </view>
+
+      <!-- Primary Entry: Voice -->
+      <view class="voice-entry-btn" bindtap="goVoiceRecord">
+        <view class="voice-btn-left">
+          <view class="voice-mic-wrap">
+            <text class="voice-mic-icon">🎙</text>
+          </view>
+          <view class="voice-btn-info">
+            <text class="voice-btn-title">语音速记</text>
+            <text class="voice-btn-tag">INSTANT_VOICE_SYNC</text>
+          </view>
+        </view>
+        <text class="voice-arrow">›</text>
+        <view class="voice-pulse"></view>
+      </view>
+
+      <!-- Secondary Entries Grid -->
+      <view class="entry-grid">
+        <!-- Drawing -->
+        <view class="entry-card" bindtap="goDrawing">
+          <view class="entry-icon-wrap">
+            <text class="entry-icon">✏️</text>
+          </view>
+          <view class="entry-info">
+            <text class="entry-title">手绘创意</text>
+            <text class="entry-tag">CANVAS</text>
+          </view>
+        </view>
+        <!-- Text Note -->
+        <view class="entry-card" bindtap="goTextNote">
+          <view class="entry-icon-wrap">
+            <text class="entry-icon">📝</text>
+          </view>
+          <view class="entry-info">
+            <text class="entry-title">文本笔记</text>
+            <text class="entry-tag">EDITOR</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- Quick Templates Section -->
+      <view class="templates-section">
+        <view class="section-header">
+          <text class="section-label">QUICK TEMPLATES</text>
+          <view class="section-line"></view>
+        </view>
+        <view class="template-list">
+          <view class="template-item" bindtap="useTemplate" data-name="会议纪要">
+            <view class="template-left">
+              <text class="template-icon">↩</text>
+              <view class="template-info">
+                <text class="template-name">会议纪要 (最近使用)</text>
+                <text class="template-meta">Last used: 2h ago</text>
+              </view>
+            </view>
+            <text class="template-bolt">⚡</text>
+          </view>
+          <view class="template-chips">
+            <view class="chip" bindtap="useTemplate" data-name="读书笔记">
+              <text class="chip-text">读书笔记</text>
+            </view>
+            <view class="chip" bindtap="useTemplate" data-name="心情随笔">
+              <text class="chip-text">心情随笔</text>
+            </view>
+            <view class="chip" bindtap="useTemplate" data-name="旅行日记">
+              <text class="chip-text">旅行日记</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Tip Card -->
+      <view class="tip-card">
+        <text class="tip-bulb">💡</text>
+        <text class="tip-text">提示：长按 <text class="tip-highlight">语音</text> 按钮可以从主屏幕直接开始录音。</text>
+      </view>
+
+      <!-- Recent Notes Section -->
+      <view class="recent-section" wx:if="{{hasNotes}}">
+        <view class="section-header">
+          <text class="section-label">RECENT NOTES</text>
+          <view class="section-line"></view>
+        </view>
+        <view class="recent-list">
+          <view
+            wx:for="{{recentNotes}}"
+            wx:key="id"
+            class="recent-item"
+          >
+            <view class="recent-item-left">
+              <view class="recent-type-icon">
+                <text class="recent-icon-text">{{item.type === 'voice' ? '🎙' : (item.type === 'drawing' ? '✏️' : '📝')}}</text>
+              </view>
+              <view class="recent-info">
+                <text class="recent-title">{{item.title}}</text>
+                <text class="recent-meta">{{item.type === 'voice' ? '语音' : (item.type === 'drawing' ? '手绘' : '文本')}} · {{item.charCount > 0 ? item.charCount + '字' : (item.duration > 0 ? item.duration + '秒' : '')}}</text>
+              </view>
+            </view>
+            <view class="recent-delete" catchtap="deleteNoteItem" data-id="{{item.id}}">
+              <text class="delete-icon">×</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Bottom Spacer for Tab Bar -->
+      <view class="bottom-spacer"></view>
+    </view>
+  </scroll-view>
+</view>
+

@@ -1,0 +1,140 @@
+<view class="note-page {{darkMode ? 'dark-mode' : ''}}">
+  <!-- Top Bar -->
+  <view class="note-topbar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="note-topbar-inner">
+      <view class="back-btn" bindtap="goBack">
+        <text class="back-arrow">‹</text>
+      </view>
+      <text class="top-bar-title">文本笔记</text>
+      <view style="width: 72rpx;">
+       
+      </view>
+    </view>
+  </view>
+
+  <!-- Note Metadata Bar -->
+  <view class="meta-bar" style="top: {{metaBarTop}}px;">
+    <view class="meta-left">
+      <view class="draft-badge">
+        <text class="draft-text">DRAFT</text>
+      </view>
+      <text class="last-edit">上次编辑：{{lastEdited}}</text>
+    </view>
+    <view class="saved-indicator">
+      <text class="cloud-icon">☁️</text>
+      <text class="saved-text">已保存</text>
+    </view>
+  </view>
+
+  <!-- Rich Text Editor -->
+  <view class="note-editor-wrap" style="top: {{scrollTop}}px; bottom: {{scrollBottom}}px;">
+    <!-- Dot Grid Background -->
+    <view class="dot-grid-bg"></view>
+    <editor
+      id="editor"
+      class="note-editor"
+      placeholder="在这里开始记录你的灵感..."
+      bindstatuschange="onEditorStatusChange"
+      bindready="onEditorReady"
+      bindinput="onEditorInput"
+      show-img-size="false"
+      show-img-toolbar="false"
+      show-img-resize="false"
+    />
+  </view>
+
+  <!-- Rich Text Toolbar -->
+  <view class="md-toolbar" style="bottom: {{mdToolbarBottom}}px;">
+    <scroll-view scroll-x class="md-toolbar-scroll">
+      <view class="md-toolbar-inner">
+        <!-- Undo / Redo -->
+        <view class="md-btn" bindtap="editorUndo">
+          <text class="md-icon">↩</text>
+        </view>
+        <view class="md-btn" bindtap="editorRedo">
+          <text class="md-icon">↪</text>
+        </view>
+        <view class="md-divider"></view>
+        <!-- Bold -->
+        <view class="md-btn {{formats.bold ? 'md-btn-active' : ''}}" bindtap="formatText" data-name="bold">
+          <text class="md-icon md-bold">B</text>
+        </view>
+        <!-- Italic -->
+        <view class="md-btn {{formats.italic ? 'md-btn-active' : ''}}" bindtap="formatText" data-name="italic">
+          <text class="md-icon md-italic">I</text>
+        </view>
+        <!-- Underline -->
+        <view class="md-btn {{formats.underline ? 'md-btn-active' : ''}}" bindtap="formatText" data-name="underline">
+          <text class="md-icon md-underline">U</text>
+        </view>
+        <!-- Strikethrough -->
+        <view class="md-btn {{formats.strike ? 'md-btn-active' : ''}}" bindtap="formatText" data-name="strike">
+          <text class="md-icon md-strike">S</text>
+        </view>
+        <view class="md-divider"></view>
+        <!-- Heading -->
+        <view class="md-btn {{formats.header === 1 ? 'md-btn-active' : ''}}" bindtap="formatHeading" data-level="1">
+          <text class="md-icon">H1</text>
+        </view>
+        <view class="md-btn {{formats.header === 2 ? 'md-btn-active' : ''}}" bindtap="formatHeading" data-level="2">
+          <text class="md-icon">H2</text>
+        </view>
+        <view class="md-divider"></view>
+        <!-- Unordered List -->
+        <view class="md-btn {{formats.list === 'bullet' ? 'md-btn-active' : ''}}" bindtap="formatList" data-type="bullet">
+          <text class="md-icon">• —</text>
+        </view>
+        <!-- Ordered List -->
+        <view class="md-btn {{formats.list === 'ordered' ? 'md-btn-active' : ''}}" bindtap="formatList" data-type="ordered">
+          <text class="md-icon">1.</text>
+        </view>
+        <!-- Todo List -->
+        <view class="md-btn {{formats.list === 'check' ? 'md-btn-active' : ''}}" bindtap="formatList" data-type="check">
+          <text class="md-icon">☑</text>
+        </view>
+        <view class="md-divider"></view>
+        <!-- Blockquote -->
+        <view class="md-btn {{formats.blockquote ? 'md-btn-active' : ''}}" bindtap="formatText" data-name="blockquote">
+          <text class="md-icon">❝</text>
+        </view>
+        <view class="md-divider"></view>
+        <!-- Alignment -->
+        <view class="md-btn {{formats.align === 'left' || !formats.align ? 'md-btn-active' : ''}}" bindtap="formatAlign" data-align="left">
+          <text class="md-icon">≡←</text>
+        </view>
+        <view class="md-btn {{formats.align === 'center' ? 'md-btn-active' : ''}}" bindtap="formatAlign" data-align="center">
+          <text class="md-icon">≡↔</text>
+        </view>
+        <view class="md-btn {{formats.align === 'right' ? 'md-btn-active' : ''}}" bindtap="formatAlign" data-align="right">
+          <text class="md-icon">≡→</text>
+        </view>
+        <view class="md-divider"></view>
+        <!-- Horizontal Rule -->
+        <view class="md-btn" bindtap="insertDivider">
+          <text class="md-icon">—</text>
+        </view>
+        <!-- Clear Format -->
+        <view class="md-btn" bindtap="clearFormat">
+          <text class="md-icon">Ⓧ</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- Bottom Action Bar -->
+  <view class="note-actions" style="bottom: {{actionsBottom}}px;">
+    <view class="note-char-count">
+      <text class="char-label">字数统计</text>
+      <text class="char-value">{{charCount}}</text>
+    </view>
+    <view class="note-action-btns">
+      <view class="btn-draft" bindtap="saveDraft">
+        <text class="btn-draft-text">保存草稿</text>
+      </view>
+      <view class="btn-send" bindtap="sendNote">
+        <text class="btn-send-text">保存</text>
+        <text class="send-arrow">↗</text>
+      </view>
+    </view>
+  </view>
+</view>
