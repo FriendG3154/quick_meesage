@@ -4,4 +4,4 @@
 /backend/.gocache/
 /backend/.gomodcache/
 /backend/*.exe
-/ent/
+/backend/ent/
