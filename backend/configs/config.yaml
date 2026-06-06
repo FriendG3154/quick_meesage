@@ -1,0 +1,9 @@
+mode: dev
+port: 6789
+wdt_shop_no: "197"
+database:
+  dsn: postgresql://postgres:mdzf.canting.pg18@101.133.137.118:5435/quick_message?sslmode=disable
+redis:
+  addr: localhost:6379
+  read_timeout: 0.2s
+  write_timeout: 0.2s
