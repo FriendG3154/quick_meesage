@@ -11,14 +11,14 @@ import (
 
 	"github.com/google/wire"
 
-	"quick_message/backend/ent"
 	"quick_message/backend/internal/conf"
+	"quick_message/backend/internal/data"
 	"quick_message/backend/internal/handler"
 )
 
 type ApiServer struct {
 	cfg     *conf.Config
-	ent     *ent.Client
+	db      *data.Client
 	handler *handler.HealthHandler
 	srv     *http.Server
 }
@@ -29,7 +29,7 @@ var WireSet = wire.NewSet(
 	handler.NewHealthHandler,
 )
 
-func NewApiServer(c *conf.Config, db *ent.Client, h *handler.HealthHandler) (*ApiServer, func(), error) {
+func NewApiServer(c *conf.Config, db *data.Client, h *handler.HealthHandler) (*ApiServer, func(), error) {
 	mux := http.NewServeMux()
 	// Go 1.22+ 模式路由:可直接限定 HTTP method。
 	mux.HandleFunc("GET /healthz", h.Get)
@@ -50,10 +50,14 @@ func NewApiServer(c *conf.Config, db *ent.Client, h *handler.HealthHandler) (*Ap
 	}
 	return &ApiServer{
 		cfg:     c,
-		ent:     db,
+		db:      db,
 		handler: h,
 		srv:     srv,
-	}, func() {}, nil
+	}, func() {
+		if err := db.Close(); err != nil {
+			slog.Warn("close data client", "error", err)
+		}
+	}, nil
 }
 
 // Run 启动 HTTP 服务,阻塞直到 ctx 取消或 Serve 返回。
