@@ -23,7 +23,7 @@ func NewSnowflakeNode() (*snowflake.Node, error) {
 
 func NewRedisClient(conf *conf.Config) (*redis.Client, error) {
 	ctx := context.Background()
-	rdb := redis.NewClient(&redis.Options{Addr: conf.Redis.Addr})
+	rdb := redis.NewClient(&redis.Options{Addr: conf.Redis.Addr, ReadTimeout: conf.Redis.ReadTimeout, WriteTimeout: conf.Redis.WriteTimeout})
 	if err := rdb.Ping(ctx).Err(); err != nil {
 		_ = rdb.Close()
 		return nil, err
