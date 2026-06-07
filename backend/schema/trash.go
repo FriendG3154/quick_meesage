@@ -13,9 +13,15 @@ func (Trash) Annotations() []schema.Annotation {
 	return []schema.Annotation{entsql.Table("trash")}
 }
 
+func (Trash) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		UUIDTimeMixin{},
+		SoftDeleteMixin{},
+	}
+}
+
 func (Trash) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").Positive().Immutable(),
 		field.String("source_id").Optional().MaxLen(255).Comment("源id"),
 		field.Int("type").Optional().Comment("垃圾源类型"),
 	}

@@ -2,13 +2,13 @@ mod:
 	go mod tidy
 
 run:
-	go run ./backend/cmd/server/... -conf ./backend/configs/config.yaml
+	go run ./cmd/server/... -conf ./configs/config.yaml
 
 gen:
 	cd backend && go generate ./...
 
 ent:
-	cd backend && ent generate --target ./ent ./schema
+	cd backend &&  ent generate --feature sql/modifier,sql/execquery,sql/upsert,sql/lock --target ./ent ./schema
 
 wire:
 	cd backend/cmd/server && wire

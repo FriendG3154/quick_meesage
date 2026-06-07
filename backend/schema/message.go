@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 type Message struct{ ent.Schema }
@@ -14,12 +15,17 @@ func (Message) Annotations() []schema.Annotation {
 	return []schema.Annotation{entsql.Table("message")}
 }
 
+func (Message) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		UUIDTimeMixin{},
+		SoftDeleteMixin{},
+	}
+}
+
 func (Message) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").MaxLen(255).NotEmpty().Unique().Immutable(),
-		field.String("user_id").Optional().MaxLen(255),
+		field.UUID("user_id", uuid.UUID{}).Optional(),
 		field.String("content").Optional().Comment("表单内容"),
-		field.Bool("is_deleted").Optional().StorageKey("delete"),
 	}
 }
 

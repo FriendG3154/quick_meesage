@@ -11,8 +11,6 @@ import (
 )
 
 type UUIDTimeMixin struct {
-	// We embed the `mixin.Schema` to avoid
-	// implementing the rest of the methods.
 	mixin.Schema
 }
 
@@ -34,7 +32,6 @@ func (UUIDTimeMixin) Fields() []ent.Field {
 
 		field.Time("updated_at").
 			Default(time.Now).
-			Immutable().
 			UpdateDefault(time.Now).
 			Annotations(
 				entsql.Default("CURRENT_TIMESTAMP"),
@@ -44,8 +41,6 @@ func (UUIDTimeMixin) Fields() []ent.Field {
 }
 
 type UUIDCreatedAtMixin struct {
-	// We embed the `mixin.Schema` to avoid
-	// implementing the rest of the methods.
 	mixin.Schema
 }
 
@@ -54,6 +49,7 @@ func (UUIDCreatedAtMixin) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Immutable().
 			Unique().
+			Default(uuid.New).
 			Comment("主键id"),
 
 		field.Time("created_at").
@@ -66,29 +62,14 @@ func (UUIDCreatedAtMixin) Fields() []ent.Field {
 	}
 }
 
-type TimeMixin struct {
-	// We embed the `mixin.Schema` to avoid
-	// implementing the rest of the methods.
+type SoftDeleteMixin struct {
 	mixin.Schema
 }
 
-func (TimeMixin) Fields() []ent.Field {
+func (SoftDeleteMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.Time("created_at").
-			Immutable().
-			Default(time.Now).
-			Annotations(
-				entsql.Default("CURRENT_TIMESTAMP"),
-			).
-			Comment("创建时间"),
-
-		field.Time("updated_at").
-			Default(time.Now).
-			Immutable().
-			UpdateDefault(time.Now).
-			Annotations(
-				entsql.Default("CURRENT_TIMESTAMP"),
-			).
-			Comment("更新时间"),
+		field.Bool("is_deleted").
+			Default(false).
+			Comment("软删除标记"),
 	}
 }
