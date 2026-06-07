@@ -49,7 +49,7 @@ type ApiServer struct {
 	dbClient   *data.Client
 }
 
-func NewApiServer(cfg *conf.Config, dbClient *data.Client, healthHandler *handler.HealthHandler) (*ApiServer, func(), error) {
+func NewHandlerServer(cfg *conf.Config, dbClient *data.Client, healthHandler *handler.HealthHandler) (*ApiServer, func(), error) {
 	e := echo.New()
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())

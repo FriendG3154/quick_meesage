@@ -7,3 +7,6 @@ redis:
   addr: localhost:6379
   read_timeout: 0.2s
   write_timeout: 0.2s
+wechat:
+  app_id: wxa731cd97aee0c93a
+  app_secret: 82fc341bc111eefba5e3ff25a5651541
