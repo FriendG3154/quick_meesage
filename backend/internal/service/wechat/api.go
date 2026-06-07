@@ -2,13 +2,21 @@ package wechatsvc
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/sha1"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
+	"quick_message/backend/internal/models"
 	"strings"
 	"time"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type accessTokenResponse struct {
@@ -101,4 +109,53 @@ func (s *Service) getJSON(ctx context.Context, endpoint string, target any) erro
 	}
 
 	return json.NewDecoder(resp.Body).Decode(target)
+}
+
+func (s *Service) GetJSSDKConfig(ctx context.Context, in *models.WxRequest) (*v1.GetJSSDKConfigResponse, error) {
+	if strings.TrimSpace(s.cfg.Wechat.AppID) == "" {
+		return nil, status.Error(codes.FailedPrecondition, "微信 AppID 未配置")
+	}
+	if strings.TrimSpace(s.cfg.Wechat.AppSecret) == "" {
+		return nil, status.Error(codes.FailedPrecondition, "微信 AppSecret 未配置，无法生成扫一扫签名")
+	}
+
+	pageURL := strings.TrimSpace(in.Url)
+	parsedURL, err := url.Parse(pageURL)
+	if err != nil || parsedURL.Scheme == "" || parsedURL.Host == "" {
+		return nil, status.Error(codes.InvalidArgument, "url 参数不合法")
+	}
+
+	jsapiTicket, err := s.getJSAPITicket(ctx)
+	if err != nil {
+		slog.Error("GetJSSDKConfig getJSAPITicket failed", slog.Any("error", err))
+		return nil, status.Error(codes.Unavailable, "获取微信签名失败")
+	}
+
+	nonceStr, err := randomHex(16)
+	if err != nil {
+		slog.Error("GetJSSDKConfig randomHex failed", slog.Any("error", err))
+		return nil, status.Error(codes.Internal, "生成微信签名失败")
+	}
+
+	timestamp := time.Now().Unix()
+	return &v1.GetJSSDKConfigResponse{
+		AppId:     s.cfg.Wechat.AppID,
+		Timestamp: timestamp,
+		NonceStr:  nonceStr,
+		Signature: signJSAPI(jsapiTicket, nonceStr, timestamp, pageURL),
+	}, nil
+}
+
+func randomHex(size int) (string, error) {
+	buf := make([]byte, size)
+	if _, err := rand.Read(buf); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(buf), nil
+}
+
+func signJSAPI(jsapiTicket, nonceStr string, timestamp int64, pageURL string) string {
+	payload := fmt.Sprintf("jsapi_ticket=%s&noncestr=%s&timestamp=%d&url=%s", jsapiTicket, nonceStr, timestamp, pageURL)
+	sum := sha1.Sum([]byte(payload))
+	return hex.EncodeToString(sum[:])
 }
