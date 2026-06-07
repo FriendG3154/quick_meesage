@@ -42,7 +42,7 @@ func (s *Service) getJSAPITicket(ctx context.Context) (string, error) {
 		return s.jsapiTicket, nil
 	}
 
-	accessToken, err := s.getAccessTokenLocked(ctx, now)
+	accessToken, err := s.GetAccessTokenLocked(ctx, now)
 	if err != nil {
 		return "", err
 	}
@@ -64,7 +64,7 @@ func (s *Service) getJSAPITicket(ctx context.Context) (string, error) {
 	return s.jsapiTicket, nil
 }
 
-func (s *Service) getAccessTokenLocked(ctx context.Context, now time.Time) (string, error) {
+func (s *Service) GetAccessTokenLocked(ctx context.Context, now time.Time) (string, error) {
 	if s.accessToken != "" && now.Before(s.accessTokenExpiry.Add(-cacheSafeWindow)) {
 		return s.accessToken, nil
 	}
@@ -111,7 +111,7 @@ func (s *Service) getJSON(ctx context.Context, endpoint string, target any) erro
 	return json.NewDecoder(resp.Body).Decode(target)
 }
 
-func (s *Service) GetJSSDKConfig(ctx context.Context, in *models.WxRequest) (*v1.GetJSSDKConfigResponse, error) {
+func (s *Service) GetJSSDKConfig(ctx context.Context, in *models.WxRequest) (*models.WxResponse, error) {
 	if strings.TrimSpace(s.cfg.Wechat.AppID) == "" {
 		return nil, status.Error(codes.FailedPrecondition, "微信 AppID 未配置")
 	}
@@ -138,7 +138,7 @@ func (s *Service) GetJSSDKConfig(ctx context.Context, in *models.WxRequest) (*v1
 	}
 
 	timestamp := time.Now().Unix()
-	return &v1.GetJSSDKConfigResponse{
+	return &models.WxResponse{
 		AppId:     s.cfg.Wechat.AppID,
 		Timestamp: timestamp,
 		NonceStr:  nonceStr,

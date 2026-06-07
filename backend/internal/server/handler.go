@@ -49,7 +49,7 @@ type ApiServer struct {
 	dbClient   *data.Client
 }
 
-func NewHandlerServer(cfg *conf.Config, dbClient *data.Client, healthHandler *handler.HealthHandler) (*ApiServer, func(), error) {
+func NewHandlerServer(cfg *conf.Config, dbClient *data.Client, healthHandler *handler.HealthHandler, wechatHandler *handler.WechatHandler) (*ApiServer, func(), error) {
 	e := echo.New()
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())
@@ -97,7 +97,7 @@ func NewHandlerServer(cfg *conf.Config, dbClient *data.Client, healthHandler *ha
 	}))
 
 	// 路由注册(详见 routes.go)
-	RegisterRoutes(e, &Handlers{Health: healthHandler})
+	RegisterRoutes(e, &Handlers{Health: healthHandler, Wechat: wechatHandler})
 
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Port),

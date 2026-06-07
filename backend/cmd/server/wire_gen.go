@@ -12,6 +12,7 @@ import (
 	"quick_message/backend/internal/data/repoiface"
 	"quick_message/backend/internal/handler"
 	"quick_message/backend/internal/server"
+	"quick_message/backend/internal/service/wechat"
 )
 
 // Injectors from wire.go:
@@ -49,7 +50,9 @@ func initDataClient(conf2 *conf.Config) (*data.Client, func(), error) {
 
 func initApiApp(conf2 *conf.Config, dbClient *data.Client) (*server.ApiServer, func(), error) {
 	healthHandler := handler.NewHealthHandler()
-	apiServer, cleanup, err := server.NewApiServer(conf2, dbClient, healthHandler)
+	service := wechatsvc.NewService(conf2)
+	wechatHandler := handler.NewWechatHandler(service)
+	apiServer, cleanup, err := server.NewHandlerServer(conf2, dbClient, healthHandler, wechatHandler)
 	if err != nil {
 		return nil, nil, err
 	}

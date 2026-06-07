@@ -6,6 +6,8 @@ type WxRequest struct {
 }
 
 type WxResponse struct {
-	Openid     string `json:"openid"`
-	SessionKey string `json:"session_key"`
+	AppId     string `json:"openid"`
+	Timestamp int64  `json:"timestamp"`
+	NonceStr  string `json:"nonce_str"`
+	Signature string `json:"signature"`
 }

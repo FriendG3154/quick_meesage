@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"quick_message/backend/internal/handler"
+	"quick_message/backend/internal/models"
 
 	"github.com/labstack/echo/v5"
 )
@@ -33,6 +34,7 @@ func RegisterRoutes(e *echo.Echo, h *Handlers) {
 // 加新 handler 只需:1) 在这里加字段 2) 在 NewApiServer 里加参数 3) 在 buildRoutes 里加路由。
 type Handlers struct {
 	Health *handler.HealthHandler
+	Wechat *handler.WechatHandler
 }
 
 func buildRoutes(h *Handlers) []route {
@@ -44,6 +46,38 @@ func buildRoutes(h *Handlers) []route {
 				// health.go 用的是 http.Handler 风格,这里适配一下
 				h.Health.Get(c.Response(), c.Request())
 				return nil
+			},
+		},
+		{
+			method: http.MethodPost,
+			path:   "/api/v1/wechat/jsapi",
+			handler: func(c *echo.Context) error {
+				// 解析请求体
+				var req models.WxRequest
+				if err := c.Bind(&req); err != nil {
+					return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+				}
+				resp, err := h.Wechat.GetJSSDKConfig(c.Request().Context(), &req)
+				if err != nil {
+					return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+				}
+				return c.JSON(http.StatusOK, resp)
+			},
+		},
+		{
+			method: http.MethodGet,
+			path:   "/api/v1/wechat/token",
+			handler: func(c *echo.Context) error {
+				// 解析请求体
+				var req models.WxRequest
+				if err := c.Bind(&req); err != nil {
+					return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+				}
+				resp, err := h.Wechat.GetAccessToken(c.Request().Context())
+				if err != nil {
+					return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+				}
+				return c.JSON(http.StatusOK, resp)
 			},
 		},
 		{
