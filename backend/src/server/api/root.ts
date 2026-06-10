@@ -4,6 +4,7 @@ import { picRouter } from "~/server/api/routers/pic";
 import { voiceRouter } from "~/server/api/routers/voice";
 import { trashRouter } from "~/server/api/routers/trash";
 import { authRouter } from "~/server/api/routers/auth";
+import { qrLoginRouter } from "~/server/api/routers/qrLogin";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -17,6 +18,7 @@ export const appRouter = createTRPCRouter({
   voice: voiceRouter,
   trash: trashRouter,
   auth: authRouter,
+  qrLogin: qrLoginRouter,
 });
 
 // 导出API类型定义

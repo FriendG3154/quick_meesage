@@ -193,8 +193,18 @@ export const userAuths = createTable("user_auth", (d) => ({
 }));
 
 /**
- * 关系定义
+ * 二维码登录会话表
+ * 存储管理后台扫码登录的临时会话
  */
+export const qrLoginSessions = createTable("qr_login_session", (d) => ({
+  id: d.uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  token: d.varchar("token", { length: 64 }).notNull().unique(), // 二维码token
+  status: d.varchar("status", { length: 20 }).default("pending").notNull(), // pending, scanned, confirmed, expired
+  userId: d.uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  createdAt: d.timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  expiresAt: d.timestamp("expires_at", { withTimezone: true }).notNull(),
+  confirmedAt: d.timestamp("confirmed_at", { withTimezone: true }),
+}));
 export const usersRelations = relations(users, ({ many, one }) => ({
   messages: many(messages),
   pics: many(pics),
@@ -253,5 +263,12 @@ export const userAuthsRelations = relations(userAuths, ({ one }) => ({
   auth: one(auths, {
     fields: [userAuths.authId],
     references: [auths.id],
+  }),
+}));
+
+export const qrLoginSessionsRelations = relations(qrLoginSessions, ({ one }) => ({
+  user: one(users, {
+    fields: [qrLoginSessions.userId],
+    references: [users.id],
   }),
 }));

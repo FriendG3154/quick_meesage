@@ -1,0 +1,42 @@
+<view class="qr-confirm-page">
+  <!-- Header -->
+  <view class="header">
+    <text class="title">确认登录</text>
+    <text class="subtitle">快灵感管理后台</text>
+  </view>
+
+  <!-- Content -->
+  <view class="content">
+    <!-- Error State -->
+    <block wx:if="{{error}}">
+      <view class="error-section">
+        <view class="error-icon">⚠️</view>
+        <text class="error-text">{{error}}</text>
+      </view>
+    </block>
+
+    <!-- Confirm State -->
+    <block wx:elif="{{showConfirm}}">
+      <view class="confirm-section">
+        <view class="icon-wrap">
+          <view class="monitor-icon">🖥️</view>
+        </view>
+        <text class="confirm-title">确认登录管理后台?</text>
+        <text class="confirm-desc">您正在尝试登录快灵感管理后台，请确认是您本人的操作</text>
+
+        <view class="action-buttons">
+          <button class="btn-cancel" bindtap="handleCancel">取消</button>
+          <button class="btn-confirm" bindtap="handleConfirm" disabled="{{loading}}">
+            <block wx:if="{{loading}}">
+              <view class="loading-wrap">
+                <view class="spinner"></view>
+                <text>处理中...</text>
+              </view>
+            </block>
+            <block wx:else>确认登录</block>
+          </button>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

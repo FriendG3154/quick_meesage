@@ -2,6 +2,7 @@
   "pages": [
     "pages/login/login",
     "pages/mobile-login/mobile-login",
+    "pages/qr-confirm/qr-confirm",
     "pages/statistics/statistics",
     "pages/index/index",
     "pages/settings/settings",

@@ -1,6 +1,6 @@
 // utils/api.ts - tRPC API 客户端封装
 
-const BASE_URL = 'http://localhost:3000/api/trpc'
+const BASE_URL = 'http://101.133.137.118:8080/api/trpc'
 
 interface ApiOptions {
   method?: 'GET' | 'POST'
@@ -66,6 +66,19 @@ export const userApi = {
   /** 获取用户统计 */
   getStats: (userId: string) =>
     trpcRequest('user.getStats', { userId }),
+}
+
+/**
+ * 二维码登录模块 API
+ */
+export const qrLoginApi = {
+  /** 扫码 */
+  scan: (data: { token: string; userId: string }) =>
+    trpcRequest<{ success: boolean }>('qrLogin.scan', data),
+
+  /** 确认登录 */
+  confirm: (data: { token: string }) =>
+    trpcRequest<{ success: boolean }>('qrLogin.confirm', data),
 }
 
 /**
