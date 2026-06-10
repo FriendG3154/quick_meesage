@@ -35,12 +35,17 @@ Page({
         throw new Error('获取登录凭证失败')
       }
 
-      // 2. 调用后端 wxLogin 接口（code换openid，自动注册）
+      // 2. 获取用户头像和昵称
+      const userInfoRes = await this._getUserProfile()
+
+      // 3. 调用后端 wxLogin 接口（code换openid，自动注册）
       const result = await userApi.wxLogin({
         code: loginRes.code,
+        wxName: userInfoRes.nickName || '微信用户',
+        avatarUrl: userInfoRes.avatarUrl || '',
       })
 
-      // 3. 保存登录状态到全局
+      // 4. 保存登录状态到全局
       const app = getApp<IAppOption>()
       app.globalData.isLoggedIn = true
       app.globalData.userId = result.user.id
@@ -53,14 +58,14 @@ Page({
 
       wx.hideLoading()
 
-      // 4. 显示欢迎提示
+      // 5. 显示欢迎提示
       if (result.isNewUser) {
         wx.showToast({ title: '注册成功！', icon: 'success' })
       } else {
         wx.showToast({ title: '登录成功！', icon: 'success' })
       }
 
-      // 5. 跳转到首页
+      // 6. 跳转到首页
       setTimeout(() => {
         wx.reLaunch({ url: '/pages/index/index' })
       }, 800)
@@ -76,5 +81,42 @@ Page({
     } finally {
       this.setData({ isLoggingIn: false })
     }
+  },
+
+  /**
+   * 获取用户头像和昵称
+   * 使用 wx.getUserProfile 或 wx.getUserInfo
+   */
+  _getUserProfile(): Promise<{ nickName: string; avatarUrl: string }> {
+    return new Promise((resolve) => {
+      // 优先使用 wx.getUserProfile（需要用户点击触发）
+      wx.getUserProfile({
+        desc: '用于完善用户资料',
+        success: (res) => {
+          resolve({
+            nickName: res.userInfo.nickName,
+            avatarUrl: res.userInfo.avatarUrl,
+          })
+        },
+        fail: () => {
+          // 降级使用 wx.getUserInfo
+          wx.getUserInfo({
+            success: (res) => {
+              resolve({
+                nickName: res.userInfo.nickName,
+                avatarUrl: res.userInfo.avatarUrl,
+              })
+            },
+            fail: () => {
+              // 如果都失败了，返回默认值
+              resolve({
+                nickName: '微信用户',
+                avatarUrl: '',
+              })
+            },
+          })
+        },
+      })
+    })
   },
 })

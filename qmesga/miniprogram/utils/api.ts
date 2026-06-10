@@ -29,7 +29,7 @@ export async function trpcRequest<T = unknown>(
       success: (res) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           const data = res.data as { result?: { data?: T } }
-          resolve(data.result?.data as T)
+          resolve(data.result?.data?.json as T)
         } else {
           const errorData = res.data as { error?: { message?: string } }
           reject(new Error(errorData.error?.message || `请求失败: ${res.statusCode}`))
@@ -54,6 +54,7 @@ export const userApi = {
         wxOpenid: string | null
         wxName: string | null
         avatarUrl: string | null
+        phone: string | null
         role: number
         isActive: boolean
       }

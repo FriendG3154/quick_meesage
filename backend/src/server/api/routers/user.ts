@@ -1,11 +1,34 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { eq, and, desc, sql, count, gte, lt } from "drizzle-orm";
+import { createDecipheriv } from "crypto";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { users, messages, auths, userAuths } from "~/server/db/schema";
 import { db } from "~/server/db";
 import { env } from "~/env";
+
+/**
+ * 解密微信加密数据
+ * @param encryptedData - 加密数据
+ * @param iv - 初始向量
+ * @param sessionKey - 会话密钥
+ * @returns 解密后的手机号
+ */
+function decryptWxData(encryptedData: string, iv: string, sessionKey: string): string {
+  const sessionKeyBuffer = Buffer.from(sessionKey, "base64");
+  const encryptedBuffer = Buffer.from(encryptedData, "base64");
+  const ivBuffer = Buffer.from(iv, "base64");
+
+  const decipher = createDecipheriv("aes-128-cbc", sessionKeyBuffer, ivBuffer);
+  decipher.setAutoPadding(true);
+
+  let decoded = decipher.update(encryptedBuffer, undefined, "utf8");
+  decoded += decipher.final("utf8");
+
+  const data = JSON.parse(decoded) as { phoneNumber?: string; purePhoneNumber?: string };
+  return data.phoneNumber ?? data.purePhoneNumber ?? "";
+}
 
 /**
  * 调用微信接口获取 openid
@@ -83,15 +106,27 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         code: z.string().min(1),
+        encryptedData: z.string().optional(),
+        iv: z.string().optional(),
         wxName: z.string().optional(),
         avatarUrl: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
-      // 1. 调用微信接口换取 openid
-      const { openid } = await wxCode2Session(input.code);
+      // 1. 调用微信接口换取 openid 和 session_key
+      const { openid, session_key } = await wxCode2Session(input.code);
 
-      // 2. 查找用户
+      // 2. 解析手机号（如果提供了加密数据）
+      let phone: string | null = null;
+      if (input.encryptedData && input.iv && session_key) {
+        try {
+          phone = decryptWxData(input.encryptedData, input.iv, session_key);
+        } catch {
+          // 解密失败，继续但不获取手机号
+        }
+      }
+
+      // 3. 查找用户
       let user = await db.query.users.findFirst({
         where: eq(users.wxOpenid, openid),
       });
@@ -99,7 +134,7 @@ export const userRouter = createTRPCRouter({
       let isNewUser = false;
 
       if (!user) {
-        // 3. 新用户 - 自动注册
+        // 4. 新用户 - 自动注册
         isNewUser = true;
         const [newUser] = await db
           .insert(users)
@@ -107,13 +142,14 @@ export const userRouter = createTRPCRouter({
             wxOpenid: openid,
             wxName: input.wxName ?? null,
             avatarUrl: input.avatarUrl ?? null,
+            phone: phone,
             role: 0, // 默认普通会员
             isActive: true,
           })
           .returning();
         user = newUser!;
 
-        // 4. 分配默认会员权限
+        // 5. 分配默认会员权限
         const defaultAuth = await getDefaultAuth();
         if (defaultAuth) {
           await db.insert(userAuths).values({
@@ -121,6 +157,21 @@ export const userRouter = createTRPCRouter({
             authId: defaultAuth.id,
             isActive: true,
           });
+        }
+      } else {
+        // 6. 老用户 - 更新信息
+        const updates: { wxName?: string; avatarUrl?: string; phone?: string } = {};
+        if (input.wxName) updates.wxName = input.wxName;
+        if (input.avatarUrl) updates.avatarUrl = input.avatarUrl;
+        if (phone) updates.phone = phone;
+
+        if (Object.keys(updates).length > 0) {
+          const [updatedUser] = await db
+            .update(users)
+            .set({ ...updates, updatedAt: new Date() })
+            .where(eq(users.id, user.id))
+            .returning();
+          user = updatedUser!;
         }
       }
 
@@ -130,6 +181,7 @@ export const userRouter = createTRPCRouter({
           wxOpenid: user.wxOpenid,
           wxName: user.wxName,
           avatarUrl: user.avatarUrl,
+          phone: user.phone,
           role: user.role,
           isActive: user.isActive,
         },
