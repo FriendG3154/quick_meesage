@@ -19,7 +19,6 @@ export default function LoginPage() {
   const [status, setStatus] = useState<QrStatus>("loading");
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [countdown, setCountdown] = useState(300); // 5分钟倒计时
-  const pollRef = useRef<NodeJS.Timeout | null>(null);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   // 创建会话
@@ -27,7 +26,7 @@ export default function LoginPage() {
     onSuccess: (data) => {
       setToken(data.token);
       setStatus("pending");
-      generateQrCode(data.token);
+      void generateQrCode(data.token);
       setCountdown(300);
     },
     onError: () => {
