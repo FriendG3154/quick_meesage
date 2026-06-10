@@ -70,6 +70,7 @@ Page({
       this.setData({ recentNotes: notes, hasNotes: notes.length > 0 })
     } catch (err) {
       console.error('加载笔记失败:', err)
+      wx.showToast({ title: '网络异常，已显示本地笔记', icon: 'none' })
       // 回退到本地数据
       const notes = getRecentNotes(5)
       this.setData({ recentNotes: notes, hasNotes: notes.length > 0 })

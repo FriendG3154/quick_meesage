@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { eq, and, desc, count, sql } from "drizzle-orm";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
@@ -95,7 +96,10 @@ export const messageRouter = createTRPCRouter({
       const message = await db.query.messages.findFirst({
         where: eq(messages.id, input.id),
       });
-      return message ?? null;
+      if (!message) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "笔记不存在" });
+      }
+      return message;
     }),
 
   /**
@@ -119,6 +123,9 @@ export const messageRouter = createTRPCRouter({
         .set({ ...data, updatedAt: new Date() })
         .where(eq(messages.id, id))
         .returning();
+      if (!message) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "笔记不存在" });
+      }
       return message;
     }),
 
@@ -137,6 +144,9 @@ export const messageRouter = createTRPCRouter({
         })
         .where(eq(messages.id, input.id))
         .returning();
+      if (!message) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "笔记不存在" });
+      }
       return message;
     }),
 
@@ -155,6 +165,9 @@ export const messageRouter = createTRPCRouter({
         })
         .where(eq(messages.id, input.id))
         .returning();
+      if (!message) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "笔记不存在" });
+      }
       return message;
     }),
 
@@ -164,7 +177,10 @@ export const messageRouter = createTRPCRouter({
   hardDelete: publicProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ input }) => {
-      await db.delete(messages).where(eq(messages.id, input.id));
+      const [message] = await db.delete(messages).where(eq(messages.id, input.id)).returning({ id: messages.id });
+      if (!message) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "笔记不存在" });
+      }
       return { success: true };
     }),
 

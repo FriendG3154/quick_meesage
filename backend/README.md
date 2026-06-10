@@ -1,29 +1,49 @@
-# Create T3 App
+# backend
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+quick_message 的后端/管理端项目，基于 Next.js 15、tRPC、Drizzle ORM 和 PostgreSQL。
 
-## What's next? How do I make an app with this?
+## 技术栈
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- Next.js 15 App Router
+- tRPC 11
+- Drizzle ORM
+- PostgreSQL
+- Tailwind CSS
+- TypeScript
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## 关键目录
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- `src/app/`：Next.js 页面与路由入口。
+- `src/server/api/root.ts`：tRPC 路由聚合。
+- `src/server/api/routers/`：业务模块路由，包括用户、笔记、图片、语音、回收站、认证和扫码登录。
+- `src/server/db/schema.ts`：数据库表结构。
+- `src/env.js`：环境变量校验。
 
-## Learn More
+## 常用命令
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+```bash
+npm run dev
+npm run typecheck
+npm run check
+npm run build
+npm run db:generate
+npm run db:migrate
+npm run db:push
+npm run db:studio
+```
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## 主要接口模块
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+- `user`：微信快捷登录、用户查询、用户列表、用户统计。
+- `message`：文本笔记、语音记录、手绘作品的创建、查询、更新、删除、恢复和统计。
+- `pic`：图片资源记录。
+- `voice`：语音资源记录。
+- `trash`：回收站记录。
+- `qrLogin`：管理端扫码登录流程。
 
-## How do I deploy this?
+## 本地开发
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+1. 配置数据库和微信相关环境变量。
+2. 执行数据库迁移或推送：`npm run db:migrate` 或 `npm run db:push`。
+3. 启动开发服务：`npm run dev`。
+4. 小程序开发版默认访问 `http://localhost:3000/api/trpc`。

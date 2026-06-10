@@ -261,7 +261,7 @@ Page({
                 charCount,
               })
               wx.removeStorageSync('draft_note_html')
-              wx.showToast({ title: '笔记已保存！', icon: 'success' })
+              wx.showToast({ title: '网络异常，已保存到本地', icon: 'none' })
               setTimeout(() => wx.navigateBack(), 1500)
             } finally {
               this.setData({ isSaving: false })

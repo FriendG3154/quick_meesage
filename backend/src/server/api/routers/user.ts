@@ -256,6 +256,9 @@ export const userRouter = createTRPCRouter({
         .set({ ...data, updatedAt: new Date() })
         .where(eq(users.id, id))
         .returning();
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "用户不存在" });
+      }
       return user;
     }),
 

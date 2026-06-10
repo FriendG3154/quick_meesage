@@ -272,7 +272,7 @@ Page({
             content: res.tempFilePath,
           })
           this.setData({ isSaving: false })
-          wx.showToast({ title: '画作已保存！', icon: 'success' })
+          wx.showToast({ title: '网络异常，已保存到本地', icon: 'none' })
           setTimeout(() => {
             wx.navigateBack()
           }, 1500)

@@ -1,6 +1,29 @@
 // utils/api.ts - tRPC API 客户端封装
 
-const BASE_URL = 'http://101.133.137.118:8080/api/trpc'
+type TrpcErrorResponse = {
+  error?: {
+    message?: string
+    json?: {
+      message?: string
+    }
+  }
+}
+
+const API_BASE_URLS = {
+  develop: 'http://101.133.137.118:8080/api/trpc',
+  trial: 'http://101.133.137.118:8080/api/trpc',
+  release: 'http://101.133.137.118:8080/api/trpc',
+} as const
+
+function getBaseUrl(): string {
+  const envVersion = wx.getAccountInfoSync?.().miniProgram.envVersion || 'release'
+  return API_BASE_URLS[envVersion as keyof typeof API_BASE_URLS] || API_BASE_URLS.release
+}
+
+function getTrpcErrorMessage(data: unknown, statusCode: number): string {
+  const errorData = data as TrpcErrorResponse
+  return errorData.error?.json?.message || errorData.error?.message || `请求失败: ${statusCode}`
+}
 
 /**
  * 发送 tRPC 请求
@@ -16,7 +39,7 @@ export async function trpcRequest<T = unknown>(
 ): Promise<T> {
   const isQuery = type === 'query'
 
-  let url = `${BASE_URL}/${path}`
+  let url = `${getBaseUrl()}/${path}`
   let method: 'GET' | 'POST' = isQuery ? 'GET' : 'POST'
   let data: Record<string, unknown> | undefined
 
@@ -45,8 +68,8 @@ export async function trpcRequest<T = unknown>(
           const responseData = res.data as { result?: { data?: { json?: T } } }
           resolve((responseData.result?.data?.json ?? responseData.result?.data) as T)
         } else {
-          const errorData = res.data as { error?: { message?: string } }
-          reject(new Error(errorData.error?.message || `请求失败: ${res.statusCode}`))
+          const errorMessage = getTrpcErrorMessage(res.data, res.statusCode)
+          reject(new Error(errorMessage))
         }
       },
       fail: (err) => {

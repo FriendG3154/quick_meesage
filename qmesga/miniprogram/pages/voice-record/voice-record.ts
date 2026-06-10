@@ -273,7 +273,7 @@ Page({
         waveformBars: BASE_WAVEFORM,
         isSaving: false,
       })
-      wx.showToast({ title: '录音已保存！', icon: 'success' })
+      wx.showToast({ title: '网络异常，已保存到本地', icon: 'none' })
       setTimeout(() => wx.navigateBack(), 1500)
     }
   },
