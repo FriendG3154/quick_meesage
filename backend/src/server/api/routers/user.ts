@@ -3,8 +3,71 @@ import { TRPCError } from "@trpc/server";
 import { eq, and, desc, sql, count, gte, lt } from "drizzle-orm";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { users, messages, pics, voices, trash, auths, userAuths } from "~/server/db/schema";
+import { users, messages, auths, userAuths } from "~/server/db/schema";
 import { db } from "~/server/db";
+import { env } from "~/env";
+
+/**
+ * 调用微信接口获取 openid
+ * @param code - 小程序登录 code
+ * @returns { openid: string, session_key: string }
+ */
+async function wxCode2Session(code: string): Promise<{ openid: string; session_key: string }> {
+  const url = `https://api.weixin.qq.com/sns/jscode2session?appid=${env.WX_APPID}&secret=${env.WX_APPSECRET}&js_code=${code}&grant_type=authorization_code`;
+
+  const response = await fetch(url);
+  const data = await response.json() as {
+    openid?: string;
+    session_key?: string;
+    errcode?: number;
+    errmsg?: string;
+  };
+
+  if (data.errcode) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: `微信接口错误: ${data.errmsg ?? data.errcode}`,
+    });
+  }
+
+  if (!data.openid) {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "无法获取微信用户信息",
+    });
+  }
+
+  return {
+    openid: data.openid,
+    session_key: data.session_key ?? "",
+  };
+}
+
+/**
+ * 获取默认会员权限
+ */
+async function getDefaultAuth() {
+  const defaultAuth = await db.query.auths.findFirst({
+    where: eq(auths.isDefault, true),
+  });
+
+  if (!defaultAuth) {
+    // 如果没有默认权限，创建免费用户权限
+    const [newAuth] = await db
+      .insert(auths)
+      .values({
+        name: "免费用户",
+        voiceMessage: false,
+        trashDays: 7,
+        maxStorage: 100,
+        isDefault: true,
+      })
+      .returning();
+    return newAuth;
+  }
+
+  return defaultAuth;
+}
 
 /**
  * 用户模块 Router
@@ -12,7 +75,70 @@ import { db } from "~/server/db";
  */
 export const userRouter = createTRPCRouter({
   /**
-   * 微信小程序登录/注册
+   * 微信小程序快捷登录
+   * 使用 wx.login 获取的 code 换取 openid，自动注册新用户
+   * 登录即注册，默认普通会员(role=0)
+   */
+  wxLogin: publicProcedure
+    .input(
+      z.object({
+        code: z.string().min(1),
+        wxName: z.string().optional(),
+        avatarUrl: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      // 1. 调用微信接口换取 openid
+      const { openid } = await wxCode2Session(input.code);
+
+      // 2. 查找用户
+      let user = await db.query.users.findFirst({
+        where: eq(users.wxOpenid, openid),
+      });
+
+      let isNewUser = false;
+
+      if (!user) {
+        // 3. 新用户 - 自动注册
+        isNewUser = true;
+        const [newUser] = await db
+          .insert(users)
+          .values({
+            wxOpenid: openid,
+            wxName: input.wxName ?? null,
+            avatarUrl: input.avatarUrl ?? null,
+            role: 0, // 默认普通会员
+            isActive: true,
+          })
+          .returning();
+        user = newUser!;
+
+        // 4. 分配默认会员权限
+        const defaultAuth = await getDefaultAuth();
+        if (defaultAuth) {
+          await db.insert(userAuths).values({
+            userId: user.id,
+            authId: defaultAuth.id,
+            isActive: true,
+          });
+        }
+      }
+
+      return {
+        user: {
+          id: user.id,
+          wxOpenid: user.wxOpenid,
+          wxName: user.wxName,
+          avatarUrl: user.avatarUrl,
+          role: user.role,
+          isActive: user.isActive,
+        },
+        isNewUser,
+      };
+    }),
+
+  /**
+   * 微信小程序登录/注册（旧接口，保留兼容）
    * 根据 wx_openid 查找或创建用户
    */
   loginByWx: publicProcedure
@@ -24,49 +150,17 @@ export const userRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
-      // 查找用户
       let user = await db.query.users.findFirst({
         where: eq(users.wxOpenid, input.wxOpenid),
       });
 
       if (!user) {
-        // 创建新用户
         const [newUser] = await db
           .insert(users)
           .values({
             wxOpenid: input.wxOpenid,
             wxName: input.wxName ?? null,
             avatarUrl: input.avatarUrl ?? null,
-            role: 0,
-          })
-          .returning();
-        user = newUser;
-      }
-
-      return { user };
-    }),
-
-  /**
-   * 手机号登录/注册
-   */
-  loginByPhone: publicProcedure
-    .input(
-      z.object({
-        phone: z.string().regex(/^1[3-9]\d{9}$/, "手机号格式不正确"),
-        code: z.string().optional(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      let user = await db.query.users.findFirst({
-        where: eq(users.phone, input.phone),
-      });
-
-      if (!user) {
-        const [newUser] = await db
-          .insert(users)
-          .values({
-            phone: input.phone,
-            wxName: `手机用户_${input.phone.slice(-4)}`,
             role: 0,
           })
           .returning();

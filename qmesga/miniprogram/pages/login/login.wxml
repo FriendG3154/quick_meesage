@@ -21,38 +21,12 @@
 
     <!-- Login Actions -->
     <view class="login-actions">
-      <!-- Primary: WeChat Login -->
-      <view class="btn-wechat" bindtap="loginWithWechat">
+      <!-- Primary: WeChat Quick Login -->
+      <view class="btn-wechat {{isLoggingIn ? 'btn-disabled' : ''}}" bindtap="wxQuickLogin">
         <view class="wechat-icon">💬</view>
-        <text class="btn-wechat-text">微信快捷登录</text>
-      </view>
-
-      <!-- Divider -->
-      <view class="divider-row">
-        <view class="divider-line"></view>
-        <text class="divider-text">OR</text>
-        <view class="divider-line"></view>
-      </view>
-
-      <!-- Secondary: Mobile Number -->
-      <view class="btn-mobile" bindtap="goToMobileLogin">
-        <view class="mobile-left">
-          <view class="phone-icon-wrap">
-            <text class="phone-icon">📱</text>
-          </view>
-          <text class="btn-mobile-text">手机号登录</text>
-        </view>
-        <text class="arrow-icon">→</text>
+        <text class="btn-wechat-text">{{isLoggingIn ? '登录中...' : '微信快捷登录'}}</text>
       </view>
     </view>
-
-    <!-- Footer Brand Repeat -->
-    <!-- <view class="footer-brand">
-      <view class="brand-icon brand-icon-sm">
-        <view class="brand-bolt">⚡</view>
-      </view>
-      <text class="brand-name brand-name-sm">VELOCITY</text>
-    </view> -->
 
     <!-- Terms -->
     <view class="terms-section">

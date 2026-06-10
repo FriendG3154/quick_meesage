@@ -7,6 +7,7 @@ interface IAppOption {
     statusBarHeight: number,
     navBarHeight: number,
     darkMode: boolean,
+    userId: string,
   }
   userInfoReadyCallback?: WechatMiniprogram.GetUserInfoSuccessCallback,
 }

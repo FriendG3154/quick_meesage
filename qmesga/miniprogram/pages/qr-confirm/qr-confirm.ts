@@ -4,6 +4,7 @@ import { qrLoginApi } from '../../utils/api'
 /**
  * 扫码确认登录页面
  * 小程序扫描二维码后跳转至此页面进行确认
+ * 仅管理员(role=2)可登录管理后台
  */
 Page({
   data: {
@@ -11,6 +12,7 @@ Page({
     loading: false,
     error: '',
     showConfirm: false,
+    adminName: '',
   },
 
   onLoad(options: Record<string, string | undefined>) {
@@ -20,11 +22,18 @@ Page({
       return
     }
 
+    // 检查用户是否已登录
+    const userId = wx.getStorageSync('userId') || ''
+    if (!userId) {
+      this.setData({ error: '请先登录小程序' })
+      return
+    }
+
     this.setData({ token, showConfirm: true })
   },
 
   /**
-   * 确认登录
+   * 确认登录管理后台
    */
   async handleConfirm() {
     const { token } = this.data
@@ -38,7 +47,7 @@ Page({
     this.setData({ loading: true })
 
     try {
-      // 步骤1：调用扫码接口
+      // 步骤1：调用扫码接口（后端会校验管理员权限）
       await qrLoginApi.scan({ token, userId })
 
       // 步骤2：调用确认接口

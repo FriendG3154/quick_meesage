@@ -8,69 +8,73 @@ const _initDark = isDarkMode()
 Page({
   data: {
     darkMode: _initDark,
+    isLoggingIn: false,
   },
 
   onShow() {
     applyTheme(this)
   },
 
-  loginWithWechat() {
-    wx.getUserProfile({
-      desc: '用于完善个人资料',
-      success: (res) => {
-        const app = getApp<IAppOption>()
-        app.globalData.userInfo = res.userInfo
-        app.globalData.isLoggedIn = true
-        wx.setStorageSync('isLoggedIn', true)
-        saveUserProfile({
-          nickname: res.userInfo.nickName,
-          avatarUrl: res.userInfo.avatarUrl,
+  /** 微信小程序快捷登录 */
+  async wxQuickLogin() {
+    if (this.data.isLoggingIn) return
+
+    this.setData({ isLoggingIn: true })
+    wx.showLoading({ title: '登录中...' })
+
+    try {
+      // 1. 调用 wx.login 获取 code
+      const loginRes = await new Promise<WechatMiniprogram.LoginSuccessCallbackResult>((resolve, reject) => {
+        wx.login({
+          success: resolve,
+          fail: reject,
         })
+      })
+
+      if (!loginRes.code) {
+        throw new Error('获取登录凭证失败')
+      }
+
+      // 2. 调用后端 wxLogin 接口（code换openid，自动注册）
+      const result = await userApi.wxLogin({
+        code: loginRes.code,
+      })
+
+      // 3. 保存登录状态到全局
+      const app = getApp<IAppOption>()
+      app.globalData.isLoggedIn = true
+      app.globalData.userId = result.user.id
+      wx.setStorageSync('isLoggedIn', true)
+      wx.setStorageSync('userId', result.user.id)
+      saveUserProfile({
+        nickname: result.user.wxName || '微信用户',
+        userId: result.user.id,
+      })
+
+      wx.hideLoading()
+
+      // 4. 显示欢迎提示
+      if (result.isNewUser) {
+        wx.showToast({ title: '注册成功！', icon: 'success' })
+      } else {
+        wx.showToast({ title: '登录成功！', icon: 'success' })
+      }
+
+      // 5. 跳转到首页
+      setTimeout(() => {
         wx.reLaunch({ url: '/pages/index/index' })
-      },
-      fail: () => {
-        // Demo: skip real auth
-        const app = getApp<IAppOption>()
-        app.globalData.isLoggedIn = true
-        wx.setStorageSync('isLoggedIn', true)
-        wx.reLaunch({ url: '/pages/index/index' })
-      },
-    })
-  },
-
-  /** 调用后端微信登录接口 */
-  async loginWithBackend() {
-    wx.login({
-      success: async (res) => {
-        if (res.code) {
-          try {
-            // 实际项目中，这里需要将 code 发送到后端换取 openid
-            // 这里使用模拟数据演示
-            const result = await userApi.loginByWx({
-              wxOpenid: `wx_${Date.now()}`,
-              wxName: '微信用户',
-            })
-
-            const app = getApp<IAppOption>()
-            app.globalData.isLoggedIn = true
-            app.globalData.userId = result.user.id
-            wx.setStorageSync('isLoggedIn', true)
-            wx.setStorageSync('userId', result.user.id)
-            saveUserProfile({
-              nickname: result.user.wxName || '微信用户',
-              userId: result.user.id,
-            })
-            wx.reLaunch({ url: '/pages/index/index' })
-          } catch (err) {
-            console.error('登录失败:', err)
-            wx.showToast({ title: '登录失败', icon: 'none' })
-          }
-        }
-      },
-    })
-  },
-
-  goToMobileLogin() {
-    wx.navigateTo({ url: '/pages/mobile-login/mobile-login' })
+      }, 800)
+    } catch (err) {
+      wx.hideLoading()
+      console.error('微信登录失败:', err)
+      wx.showModal({
+        title: '登录失败',
+        content: err instanceof Error ? err.message : '请检查网络后重试',
+        showCancel: false,
+        confirmText: '知道了',
+      })
+    } finally {
+      this.setData({ isLoggingIn: false })
+    }
   },
 })

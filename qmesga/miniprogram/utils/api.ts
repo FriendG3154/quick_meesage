@@ -2,14 +2,9 @@
 
 const BASE_URL = 'http://101.133.137.118:8080/api/trpc'
 
-interface ApiOptions {
-  method?: 'GET' | 'POST'
-  body?: Record<string, unknown>
-}
-
 /**
  * 发送 tRPC 请求
- * @param path - tRPC 路由路径，如 "user.loginByWx"
+ * @param path - tRPC 路由路径，如 "user.wxLogin"
  * @param input - 请求参数
  * @returns Promise<unknown>
  */
@@ -51,13 +46,19 @@ export async function trpcRequest<T = unknown>(
  * 用户模块 API
  */
 export const userApi = {
-  /** 微信登录 */
-  loginByWx: (data: { wxOpenid: string; wxName?: string; avatarUrl?: string }) =>
-    trpcRequest<{ user: { id: string; wxName: string | null; role: number } }>('user.loginByWx', data),
-
-  /** 手机号登录 */
-  loginByPhone: (data: { phone: string; code?: string }) =>
-    trpcRequest<{ user: { id: string; wxName: string | null; role: number } }>('user.loginByPhone', data),
+  /** 微信小程序快捷登录（code换openid，自动注册） */
+  wxLogin: (data: { code: string; wxName?: string; avatarUrl?: string }) =>
+    trpcRequest<{
+      user: {
+        id: string
+        wxOpenid: string | null
+        wxName: string | null
+        avatarUrl: string | null
+        role: number
+        isActive: boolean
+      }
+      isNewUser: boolean
+    }>('user.wxLogin', data),
 
   /** 获取用户信息 */
   getById: (id: string) =>
@@ -69,7 +70,7 @@ export const userApi = {
 }
 
 /**
- * 二维码登录模块 API
+ * 二维码登录模块 API（管理端扫码登录）
  */
 export const qrLoginApi = {
   /** 扫码 */
