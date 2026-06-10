@@ -4,23 +4,37 @@ const BASE_URL = 'http://101.133.137.118:8080/api/trpc'
 
 /**
  * 发送 tRPC 请求
- * @param path - tRPC 路由路径，如 "user.wxLogin"
+ * @param path - tRPC 路由路径
  * @param input - 请求参数
- * @returns Promise<unknown>
+ * @param type - 请求类型: query 用 GET, mutation 用 POST
+ * @returns Promise<T>
  */
 export async function trpcRequest<T = unknown>(
   path: string,
-  input?: Record<string, unknown>
+  input?: Record<string, unknown>,
+  type: 'query' | 'mutation' = 'mutation'
 ): Promise<T> {
-  const url = `${BASE_URL}/${path}`
+  const isQuery = type === 'query'
+
+  let url = `${BASE_URL}/${path}`
+  let method: 'GET' | 'POST' = isQuery ? 'GET' : 'POST'
+  let data: Record<string, unknown> | undefined
+
+  if (isQuery && input) {
+    // query 过程: 参数编码到 URL query string (tRPC batch 格式)
+    url += `?input=${encodeURIComponent(JSON.stringify({ json: input }))}`
+  } else if (input) {
+    // mutation 过程: 参数放在 body
+    data = { json: input }
+  }
 
   const options: WechatMiniprogram.RequestOption = {
     url,
-    method: input ? 'POST' : 'GET',
+    method,
     header: {
       'Content-Type': 'application/json',
     },
-    data: input ? { json: input } : undefined,
+    data,
   }
 
   return new Promise((resolve, reject) => {
@@ -28,8 +42,8 @@ export async function trpcRequest<T = unknown>(
       ...options,
       success: (res) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          const data = res.data as { result?: { data?: T } }
-          resolve(data.result?.data?.json as T)
+          const responseData = res.data as { result?: { data?: { json?: T } } }
+          resolve((responseData.result?.data?.json ?? responseData.result?.data) as T)
         } else {
           const errorData = res.data as { error?: { message?: string } }
           reject(new Error(errorData.error?.message || `请求失败: ${res.statusCode}`))
@@ -59,28 +73,32 @@ export const userApi = {
         isActive: boolean
       }
       isNewUser: boolean
-    }>('user.wxLogin', data),
+    }>('user.wxLogin', data, 'mutation'),
 
   /** 获取用户信息 */
   getById: (id: string) =>
-    trpcRequest('user.getById', { id }),
+    trpcRequest('user.getById', { id }, 'query'),
 
   /** 获取用户统计 */
   getStats: (userId: string) =>
-    trpcRequest('user.getStats', { userId }),
+    trpcRequest('user.getStats', { userId }, 'query'),
 }
 
 /**
  * 二维码登录模块 API（管理端扫码登录）
  */
 export const qrLoginApi = {
+  /** 查询扫码状态 */
+  checkStatus: (data: { token: string }) =>
+    trpcRequest<{ status: string; user?: { id: string; wxName: string | null; role: number } }>('qrLogin.checkStatus', data, 'query'),
+
   /** 扫码 */
   scan: (data: { token: string; userId: string }) =>
-    trpcRequest<{ success: boolean }>('qrLogin.scan', data),
+    trpcRequest<{ success: boolean }>('qrLogin.scan', data, 'mutation'),
 
   /** 确认登录 */
   confirm: (data: { token: string }) =>
-    trpcRequest<{ success: boolean }>('qrLogin.confirm', data),
+    trpcRequest<{ success: boolean }>('qrLogin.confirm', data, 'mutation'),
 }
 
 /**
@@ -96,7 +114,7 @@ export const messageApi = {
     template?: string
     charCount?: number
     duration?: number
-  }) => trpcRequest('message.create', data),
+  }) => trpcRequest('message.create', data, 'mutation'),
 
   /** 获取笔记列表 */
   list: (data: {
@@ -104,11 +122,15 @@ export const messageApi = {
     type?: 'text' | 'voice' | 'drawing'
     page?: number
     pageSize?: number
-  }) => trpcRequest('message.list', data),
+  }) => trpcRequest('message.list', data, 'query'),
 
   /** 软删除笔记 */
   softDelete: (id: string) =>
-    trpcRequest('message.softDelete', { id }),
+    trpcRequest('message.softDelete', { id }, 'mutation'),
+
+  /** 全局统计 */
+  getGlobalStats: () =>
+    trpcRequest('message.getGlobalStats', undefined, 'query'),
 }
 
 /**
@@ -123,7 +145,7 @@ export const voiceApi = {
     remark?: string
     content?: string
     duration?: number
-  }) => trpcRequest('voice.create', data),
+  }) => trpcRequest('voice.create', data, 'mutation'),
 }
 
 /**
@@ -136,7 +158,7 @@ export const picApi = {
     messageId?: string
     picUrl: string
     remark?: string
-  }) => trpcRequest('pic.create', data),
+  }) => trpcRequest('pic.create', data, 'mutation'),
 }
 
 /**
@@ -149,5 +171,5 @@ export const trashApi = {
     sourceType: 'message' | 'pic' | 'voice'
     userId: string
     expiredAt: string
-  }) => trpcRequest('trash.moveToTrash', data),
+  }) => trpcRequest('trash.moveToTrash', data, 'mutation'),
 }
