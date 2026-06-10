@@ -1,6 +1,7 @@
 // pages/mobile-login/mobile-login.ts
 import { saveUserProfile } from '../../utils/storage'
 import { applyTheme, isDarkMode } from '../../utils/theme'
+import { userApi } from '../../utils/api'
 
 const _initDark = isDarkMode()
 
@@ -59,22 +60,35 @@ Page({
     }, 1000)
   },
 
-  doLogin() {
+  /** 手机号登录 */
+  async doLogin() {
     if (!this.data.canLogin) return
     wx.showLoading({ title: '登录中...' })
-    setTimeout(() => {
+
+    try {
+      const result = await userApi.loginByPhone({
+        phone: this.data.phone,
+        code: this.data.code,
+      })
+
       wx.hideLoading()
       const app = getApp<IAppOption>()
       app.globalData.isLoggedIn = true
+      app.globalData.userId = result.user.id
       wx.setStorageSync('isLoggedIn', true)
-      // 保存手机号用户信息
-      const phone = this.data.phone
+      wx.setStorageSync('userId', result.user.id)
+
       saveUserProfile({
-        nickname: '手机用户',
-        userId: `USER_${phone.slice(-4)}`,
+        nickname: result.user.wxName || '手机用户',
+        userId: result.user.id,
       })
+
       wx.reLaunch({ url: '/pages/index/index' })
-    }, 1200)
+    } catch (err) {
+      wx.hideLoading()
+      console.error('登录失败:', err)
+      wx.showToast({ title: '登录失败，请重试', icon: 'none' })
+    }
   },
 
   goBackToWechatLogin() {
