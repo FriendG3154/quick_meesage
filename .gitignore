@@ -1,7 +1,66 @@
-/backend/bin/
-/dist/
+# 项目级忽略规则
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE 编辑器
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+tmp/
+temp/
+*.tmp
+
+# 后端构建产物
+/backend/dist/
+/backend/build/
+/backend/.next/
+/backend/out/
+
+# 后端本地环境
 /backend/.env
+/backend/.env.*.local
+!/backend/.env.example
+
+# 后端缓存
 /backend/.gocache/
 /backend/.gomodcache/
+
+# 后端可执行文件
 /backend/*.exe
+
+# 后端生成的代码
 /backend/ent/
+/backend/generated/
+
+# 后端测试覆盖率
+/backend/coverage/
+
+# 后端 TypeScript 构建信息
+/backend/*.tsbuildinfo
+
+# 后端调试日志
+/backend/npm-debug.log*
+/backend/yarn-debug.log*
+/backend/yarn-error.log*
+/backend/.pnpm-debug.log*
+
+# 后端 Vercel 部署
+/backend/.vercel
+
+# 小程序
+/qmesga/miniprogram_npm/
+/qmesga/node_modules/
+
+# 依赖目录（根目录级别）
+node_modules/
