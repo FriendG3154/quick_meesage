@@ -1,6 +1,7 @@
 // pages/text-note/text-note.ts
 import { saveNote } from '../../utils/storage'
 import { applyTheme, isDarkMode } from '../../utils/theme'
+import { messageApi } from '../../utils/api'
 
 const _initDark = isDarkMode()
 
@@ -19,6 +20,8 @@ Page({
     keyboardHeight: 0,
     hasDraft: false,
     formats: {} as Record<string, any>,
+    userId: '',
+    isSaving: false,
   },
 
   _autoSaveTimer: null as ReturnType<typeof setTimeout> | null,
@@ -46,6 +49,10 @@ Page({
     if (templateName) {
       this.setData({ template: templateName })
     }
+
+    // 获取用户ID
+    const userId = wx.getStorageSync('userId') || ''
+    this.setData({ userId })
 
     wx.onKeyboardHeightChange((res) => {
       const kbHeight = res.height
@@ -203,29 +210,62 @@ Page({
     })
   },
 
-  sendNote() {
-    this._getHtml((html: string) => {
+  /** 保存笔记到后端 */
+  async sendNote() {
+    this._getHtml(async (html: string) => {
       const text = html.replace(/<[^>]+>/g, '')
       if (!text.trim()) {
         wx.showToast({ title: '请先输入内容', icon: 'none' })
         return
       }
       const charCount = this.data.charCount
+      const userId = this.data.userId
+
       wx.showModal({
         title: '保存笔记',
         content: `确认保存这篇笔记吗？（${charCount} 字）`,
         confirmText: '保存',
-        success: (res) => {
+        success: async (res) => {
           if (res.confirm) {
-            saveNote({
-              type: 'text',
-              content: html,
-              template: this.data.template,
-              charCount,
-            })
-            wx.removeStorageSync('draft_note_html')
-            wx.showToast({ title: '笔记已保存！', icon: 'success' })
-            setTimeout(() => wx.navigateBack(), 1500)
+            this.setData({ isSaving: true })
+            try {
+              if (userId) {
+                // 调用后端接口保存
+                await messageApi.create({
+                  userId,
+                  type: 'text',
+                  title: this.data.template || '文本笔记',
+                  content: html,
+                  template: this.data.template,
+                  charCount,
+                })
+              } else {
+                // 未登录，保存到本地
+                saveNote({
+                  type: 'text',
+                  content: html,
+                  template: this.data.template,
+                  charCount,
+                })
+              }
+              wx.removeStorageSync('draft_note_html')
+              wx.showToast({ title: '笔记已保存！', icon: 'success' })
+              setTimeout(() => wx.navigateBack(), 1500)
+            } catch (err) {
+              console.error('保存失败:', err)
+              // 回退到本地保存
+              saveNote({
+                type: 'text',
+                content: html,
+                template: this.data.template,
+                charCount,
+              })
+              wx.removeStorageSync('draft_note_html')
+              wx.showToast({ title: '笔记已保存！', icon: 'success' })
+              setTimeout(() => wx.navigateBack(), 1500)
+            } finally {
+              this.setData({ isSaving: false })
+            }
           }
         },
       })

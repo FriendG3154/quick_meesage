@@ -1,6 +1,7 @@
 // pages/voice-record/voice-record.ts
 import { saveNote } from '../../utils/storage'
 import { applyTheme, isDarkMode } from '../../utils/theme'
+import { messageApi, voiceApi } from '../../utils/api'
 
 const BASE_WAVEFORM = [24, 32, 48, 64, 80, 56, 72, 48, 40, 56, 32, 24]
 const RECORDING_WAVEFORMS = [
@@ -23,6 +24,8 @@ Page({
     waveformBars: BASE_WAVEFORM,
     transcriptionText: '按下麦克风按钮开始录音...',
     template: '',
+    userId: '',
+    isSaving: false,
   },
 
   _recManager: null as WechatMiniprogram.RecorderManager | null,
@@ -49,6 +52,7 @@ Page({
       statusBarHeight: sb,
       contentTop: sb + 44 + 32,
       template: options.template || '',
+      userId: wx.getStorageSync('userId') || '',
     })
     this._recManager = wx.getRecorderManager()
     this._recManager.onStop((res) => {
@@ -60,13 +64,11 @@ Page({
       }
     })
     this._recManager.onError(() => {
-      // 如果正在完成保存或已经成功停止，忽略错误（部分设备会同时触发 onStop 和 onError）
       if (this._finishing || this._stopped) {
         this._finishing = false
         return
       }
       wx.showToast({ title: '录音出错', icon: 'none' })
-      // 不调用 _stopAll()（其中会再次调用 stop() 导致循环触发 onError），直接清理状态
       this._stopTimer()
       this._stopWaveform()
       this._seconds = 0
@@ -207,27 +209,73 @@ Page({
     }
   },
 
-  _doSaveAndExit(filePath: string) {
+  /** 保存录音并退出 */
+  async _doSaveAndExit(filePath: string) {
     const duration = this._seconds
+    const userId = this.data.userId
 
-    // 保存录音记录到存储
-    saveNote({
-      type: 'voice',
-      content: filePath,
-      template: this.data.template,
-      duration,
-    })
+    this.setData({ isSaving: true })
 
-    this._seconds = 0
-    this.setData({
-      isRecording: false,
-      isPaused: false,
-      timerDisplay: '00:00',
-      waveformBars: BASE_WAVEFORM,
-    })
+    try {
+      if (userId) {
+        // 调用后端接口保存
+        const result = await messageApi.create({
+          userId,
+          type: 'voice',
+          title: `语音记录 ${new Date().toLocaleDateString('zh-CN')}`,
+          content: filePath,
+          duration,
+        }) as any
 
-    wx.showToast({ title: '录音已保存！', icon: 'success' })
-    setTimeout(() => wx.navigateBack(), 1500)
+        // 同时创建语音资源记录
+        if (result?.id) {
+          await voiceApi.create({
+            userId,
+            messageId: result.id,
+            url: filePath,
+            duration,
+          })
+        }
+      } else {
+        // 未登录，保存到本地
+        saveNote({
+          type: 'voice',
+          content: filePath,
+          template: this.data.template,
+          duration,
+        })
+      }
+
+      this._seconds = 0
+      this.setData({
+        isRecording: false,
+        isPaused: false,
+        timerDisplay: '00:00',
+        waveformBars: BASE_WAVEFORM,
+        isSaving: false,
+      })
+
+      wx.showToast({ title: '录音已保存！', icon: 'success' })
+      setTimeout(() => wx.navigateBack(), 1500)
+    } catch (err) {
+      console.error('保存录音失败:', err)
+      // 回退到本地保存
+      saveNote({
+        type: 'voice',
+        content: filePath,
+        template: this.data.template,
+        duration,
+      })
+      this.setData({
+        isRecording: false,
+        isPaused: false,
+        timerDisplay: '00:00',
+        waveformBars: BASE_WAVEFORM,
+        isSaving: false,
+      })
+      wx.showToast({ title: '录音已保存！', icon: 'success' })
+      setTimeout(() => wx.navigateBack(), 1500)
+    }
   },
 
   goBack() {
