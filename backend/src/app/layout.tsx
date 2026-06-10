@@ -1,9 +1,9 @@
-import "~/styles/globals.css";
-
 import { type Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Playfair_Display, Source_Sans_3 } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
+
+import "~/styles/globals.css";
 
 export const metadata: Metadata = {
   title: "快灵感管理后台",
@@ -11,17 +11,27 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-const geist = Geist({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  variable: "--font-display",
+  weight: ["400", "500", "600", "700"],
+});
+
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className={`${geist.variable}`}>
-      <body className="min-h-screen bg-gray-50">
+    <html
+      lang="zh-CN"
+      className={`${playfair.variable} ${sourceSans.variable}`}
+    >
+      <body className="min-h-screen bg-[#faf9f7] antialiased">
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
     </html>

@@ -1,31 +1,49 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --color-primary: #0052ff;
-  --color-primary-dark: #002b85;
-  --color-danger: #ba1a1a;
-  --color-success: #34c759;
-  --color-warning: #ffb800;
-  --color-bg-dark: #0f0f0f;
-  --color-bg-light: #f9f9f9;
-  --color-text-primary: #1a1c1c;
-  --color-text-secondary: #6c7b6c;
-  --color-border: #e5e7eb;
+  --font-display: var(--font-display), "Georgia", "Times New Roman", serif;
+  --font-body: var(--font-body), "Helvetica Neue", Arial, sans-serif;
+
+  /* 编辑风调色板 - 暖色调 */
+  --color-ink: #1c1917;
+  --color-ink-light: #44403c;
+  --color-ink-muted: #78716c;
+  --color-ink-faint: #a8a29e;
+  --color-parchment: #faf9f7;
+  --color-parchment-dark: #f5f3ef;
+  --color-parchment-border: #e7e5e0;
+  --color-amber: #c9772b;
+  --color-amber-light: #d4a574;
+  --color-amber-pale: #f5e6d3;
+  --color-rose: #b4534e;
+  --color-rose-pale: #f5e0df;
+  --color-sage: #5c7a5c;
+  --color-sage-pale: #e8f0e8;
+  --color-slate: #4a5568;
+  --color-slate-pale: #e8ecf1;
 }
 
+/* 全局样式 */
 body {
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-light);
+  color: var(--color-ink);
+  background-color: var(--color-parchment);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 显示字体 */
+.font-display {
+  font-family: var(--font-display);
 }
 
 /* 自定义滚动条 */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -33,10 +51,72 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 3px;
+  background: #d6d3ce;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #a8a29e;
+}
+
+/* 纸张纹理背景 */
+.paper-texture {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+/* 交错动画延迟 */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+
+/* 选择文字样式 */
+::selection {
+  background-color: var(--color-amber-pale);
+  color: var(--color-ink);
 }

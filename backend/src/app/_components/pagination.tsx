@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -16,12 +14,14 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
     return currentPage - 2 + i;
   });
 
+  if (totalPages <= 1) return null;
+
   return (
-    <div className="flex items-center justify-center gap-2 mt-6">
+    <div className="flex items-center justify-center gap-1.5 mt-8">
       <button
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}
-        className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="px-3 py-2 text-[12px] font-medium text-[#78716c] border border-[#e7e5e0] hover:border-[#c9772b] hover:text-[#c9772b] disabled:opacity-30 disabled:hover:border-[#e7e5e0] disabled:hover:text-[#78716c] disabled:cursor-not-allowed transition-all duration-200"
       >
         上一页
       </button>
@@ -30,10 +30,10 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         <button
           key={page}
           onClick={() => onPageChange(page)}
-          className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
+          className={`w-9 h-9 text-[13px] font-medium transition-all duration-200 ${
             page === currentPage
-              ? "bg-[#0052ff] text-white"
-              : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+              ? "bg-[#1c1917] text-white border border-[#1c1917]"
+              : "text-[#78716c] border border-[#e7e5e0] hover:border-[#c9772b] hover:text-[#c9772b]"
           }`}
         >
           {page}
@@ -43,7 +43,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
       <button
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages}
-        className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="px-3 py-2 text-[12px] font-medium text-[#78716c] border border-[#e7e5e0] hover:border-[#c9772b] hover:text-[#c9772b] disabled:opacity-30 disabled:hover:border-[#e7e5e0] disabled:hover:text-[#78716c] disabled:cursor-not-allowed transition-all duration-200"
       >
         下一页
       </button>

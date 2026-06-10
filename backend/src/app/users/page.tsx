@@ -5,7 +5,6 @@ import { api } from "~/trpc/react";
 import { Sidebar } from "../_components/sidebar";
 import { SearchInput } from "../_components/search-input";
 import { Pagination } from "../_components/pagination";
-import { Badge } from "../_components/badge";
 
 export default function UsersPage() {
   const [page, setPage] = useState(1);
@@ -23,38 +22,39 @@ export default function UsersPage() {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 ml-[240px] p-10 paper-texture">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-10 flex items-end justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">用户管理</h1>
-            <p className="text-sm text-gray-500 mt-1">管理所有注册用户</p>
+            <p className="text-[11px] font-medium text-[#78716c] tracking-[0.2em] uppercase mb-2">User Management</p>
+            <h1 className="font-display text-[28px] font-semibold text-[#1c1917] tracking-tight">用户管理</h1>
+            <p className="text-[13px] text-[#78716c] mt-1">管理所有注册用户</p>
           </div>
           <SearchInput value={search} onChange={setSearch} placeholder="搜索用户名或手机号..." />
         </div>
 
         {/* Users Table */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white border border-[#e7e5e0]">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <tr className="border-b border-[#e7e5e0]">
+                  <th className="px-7 py-3.5 text-left text-[10px] font-semibold text-[#78716c] tracking-[0.15em] uppercase">
                     用户
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-7 py-3.5 text-left text-[10px] font-semibold text-[#78716c] tracking-[0.15em] uppercase">
                     手机号
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-7 py-3.5 text-left text-[10px] font-semibold text-[#78716c] tracking-[0.15em] uppercase">
                     角色
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-7 py-3.5 text-left text-[10px] font-semibold text-[#78716c] tracking-[0.15em] uppercase">
                     状态
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-7 py-3.5 text-left text-[10px] font-semibold text-[#78716c] tracking-[0.15em] uppercase">
                     注册时间
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-7 py-3.5 text-left text-[10px] font-semibold text-[#78716c] tracking-[0.15em] uppercase">
                     操作
                   </th>
                 </tr>
@@ -62,50 +62,61 @@ export default function UsersPage() {
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-gray-400">
-                      加载中...
+                    <td colSpan={6} className="px-7 py-10 text-center text-[13px] text-[#a8a29e]">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-[#e7e5e0] border-t-[#c9772b] rounded-full animate-spin" />
+                        加载中...
+                      </div>
                     </td>
                   </tr>
                 ) : data?.items.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-gray-400">
+                    <td colSpan={6} className="px-7 py-10 text-center text-[13px] text-[#a8a29e]">
                       暂无用户数据
                     </td>
                   </tr>
                 ) : (
                   data?.items.map((user) => (
-                    <tr key={user.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
-                      <td className="px-6 py-4">
+                    <tr key={user.id} className="border-b border-[#f5f3ef] last:border-0 hover:bg-[#faf9f7] transition-colors duration-200">
+                      <td className="px-7 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-[#0052ff]/10 flex items-center justify-center text-sm font-medium text-[#0052ff]">
+                          <div className="w-9 h-9 rounded-full bg-[#f5e6d3] flex items-center justify-center text-[12px] font-semibold text-[#c9772b]">
                             {(user.wxName ?? "U")[0]}
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-900">{user.wxName ?? "未知用户"}</p>
-                            <p className="text-xs text-gray-400">{user.wxOpenid ? "微信用户" : "手机用户"}</p>
+                            <p className="text-[13px] font-medium text-[#1c1917]">{user.wxName ?? "未知用户"}</p>
+                            <p className="text-[11px] text-[#a8a29e]">{user.wxOpenid ? "微信用户" : "手机用户"}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{user.phone ?? "-"}</td>
-                      <td className="px-6 py-4">
-                        <Badge
-                          variant={
-                            user.role === 2 ? "danger" : user.role === 1 ? "info" : "default"
-                          }
-                        >
+                      <td className="px-7 py-4 text-[13px] text-[#78716c]">{user.phone ?? "-"}</td>
+                      <td className="px-7 py-4">
+                        <span className={`inline-flex items-center px-2 py-[2px] text-[11px] font-medium border ${
+                          user.role === 2
+                            ? "bg-[#f5e0df] text-[#b4534e] border-[#e5cfcf]"
+                            : user.role === 1
+                            ? "bg-[#e8f0e8] text-[#5c7a5c] border-[#d0e0d0]"
+                            : "bg-[#f5f3ef] text-[#78716c] border-[#e7e5e0]"
+                        }`}>
                           {user.role === 2 ? "管理员" : user.role === 1 ? "会员" : "普通用户"}
-                        </Badge>
+                        </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <Badge variant={user.isActive ? "success" : "warning"}>
+                      <td className="px-7 py-4">
+                        <span className={`inline-flex items-center px-2 py-[2px] text-[11px] font-medium border ${
+                          user.isActive
+                            ? "bg-[#e8f0e8] text-[#5c7a5c] border-[#d0e0d0]"
+                            : "bg-[#f5e6d3] text-[#c9772b] border-[#e7d5c0]"
+                        }`}>
                           {user.isActive ? "活跃" : "禁用"}
-                        </Badge>
+                        </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
+                      <td className="px-7 py-4 text-[13px] text-[#a8a29e]">
                         {user.createdAt ? new Date(user.createdAt).toLocaleDateString("zh-CN") : "-"}
                       </td>
-                      <td className="px-6 py-4">
-                        <button className="text-sm text-[#0052ff] hover:underline">查看详情</button>
+                      <td className="px-7 py-4">
+                        <button className="text-[13px] text-[#c9772b] hover:text-[#a06020] transition-colors duration-200 font-medium">
+                          查看详情
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -115,7 +126,9 @@ export default function UsersPage() {
           </div>
 
           {totalPages > 1 && (
-            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+            <div className="py-4 border-t border-[#f5f3ef]">
+              <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+            </div>
           )}
         </div>
       </main>
